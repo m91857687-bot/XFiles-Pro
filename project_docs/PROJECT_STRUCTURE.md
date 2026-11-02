@@ -1,6 +1,6 @@
 # XFiles Pro — PROJECT STRUCTURE (بنية وهيكل مجلدات المشروع)
 
-يشرح هذا المستند التقسيم الهيكلي لحزم المشروع وملفات المصدر والموارد بعد اكتمال المرحلتين الأولى والثانية.
+يشرح هذا المستند التقسيم الهيكلي لحزم المشروع وملفات المصدر والموارد بعد اكتمال المراحل 1 و 2 و 3 و 4 و 5A.
 
 ---
 
@@ -29,12 +29,13 @@
 │       │       ├── values-ar/strings.xml  # المرجع العربي (ar)
 │       │       ├── values-es/strings.xml  # المرجع الإسباني (es)
 │       │       └── values-fa/strings.xml  # المرجع الفارسي (fa)
-│       ├── test/java/com/xfiles/pro/      # اختبارات الوحدة وRobolectric (27 اختباراً)
+│       ├── test/java/com/xfiles/pro/      # اختبارات الوحدة وRobolectric (86 اختباراً ناجحاً 100%)
 │       └── androidTest/java/com/xfiles/pro/
 ├── gradle/
 │   └── libs.versions.toml     # كتالوج إصدارات المكتبات الموحد
 ├── build.gradle.kts           # إعدادات البناء على مستوى الجذر
 ├── settings.gradle.kts        # تعريف المشروع والوحدات (rootProject.name = "XFiles Pro")
+├── .env.example               # نموذج المتغيرات البيئية الافتراضية للـ Secrets Plugin
 └── metadata.json              # بيانات تعريف التطبيق على منصة Google AI Studio
 ```
 
@@ -63,28 +64,40 @@ com.xfiles.pro
 │   │   ├── FileItem.kt                  # نموذج عنصر الملف أو المجلد
 │   │   ├── FileType.kt                  # تصنيفات أنواع الملفات
 │   │   ├── StorageVolume.kt             # نموذج وحدة التخزين وحساب السعات
-│   │   └── FileSortOption.kt            # معايير فرز الملفات
+│   │   ├── FileSortOption.kt            # معايير فرز الملفات
+│   │   ├── FileConflictResolution.kt    # خيارات تعارض الأسماء (OVERWRITE, SKIP, AUTO_RENAME)
+│   │   ├── SafPermission.kt             # نموذج أذونات SAF المحفوظة
+│   │   ├── StorageEvent.kt              # أحداث التخزين اللحظية (Created, Updated, Deleted, Moved)
+│   │   └── IndexingState.kt             # نموذج حالة الفهرسة الدائمة والتقدم
 │   └── repository/
 │       ├── LanguageRepository.kt        # عقد مستودع إدارة اللغات
 │       ├── ThemeRepository.kt           # عقد مستودع إدارة السمات
-│       └── StorageRepository.kt         # عقد مستودع التخزين
+│       ├── StorageRepository.kt         # عقد مستودع التخزين والـ SAF ودفق الأحداث
+│       └── FileIndexingRepository.kt    # عقد مستودع الفهرسة الدائمة والبحث النصي FTS
 │
 ├── data/                                # طبقة البيانات
 │   ├── local/
 │   │   ├── database/
-│   │   │   ├── XFilesDatabase.kt        # قاعدة بيانات Room التأسيسية
-│   │   │   ├── entity/IndexedFileEntity.kt
-│   │   │   └── dao/IndexedFileDao.kt
-│   │   └── datastore/
-│   │       ├── LanguagePreferences.kt   # حفظ تفضيلات اللغة وحالة أول تشغيل عبر DataStore
-│   │       └── ThemePreferences.kt      # حفظ تفضيلات السمة ومزامنتها عبر نفس الـ DataStore
+│   │   │   ├── XFilesDatabase.kt        # قاعدة بيانات Room (إصدار 2 مع MIGRATION_1_2)
+│   │   │   ├── entity/IndexedFileEntity.kt     # جدول الفهرس الدائم الموسع بـ 16 حقلاً
+│   │   │   ├── entity/IndexedFileFtsEntity.kt  # جدول FTS4/FTS5 الافتراضي للبحث النصي
+│   │   │   └── dao/IndexedFileDao.kt           # استعلامات FTS والبحث والتصفية الدفعية
+│   │   ├── datastore/
+│   │   │   ├── LanguagePreferences.kt   # حفظ تفضيلات اللغة وحالة أول تشغيل عبر DataStore
+│   │   │   └── ThemePreferences.kt      # حفظ تفضيلات السمة ومزامنتها عبر نفس الـ DataStore
+│   │   └── storage/
+│   │       ├── SafManager.kt            # إدارة أذونات ومستندات Storage Access Framework
+│   │       └── MediaStoreManager.kt     # إدارة استعلامات Android MediaStore
+│   ├── worker/
+│   │   └── FileIndexingWorker.kt        # عامل WorkManager للجدولة الخلفية مع قيود البطارية
 │   └── repository/
 │       ├── LanguageRepositoryImpl.kt    # تطبيق مستودع اللغة المدعوم بـ DataStore
 │       ├── ThemeRepositoryImpl.kt       # تطبيق مستودع السمة المدعوم بـ DataStore
-│       └── StorageRepositoryImpl.kt     # تطبيق مستودع التخزين المعتمد على SAF
+│       ├── StorageRepositoryImpl.kt     # تطبيق مستودع التخزين المعتمد على SAF و MediaStore والنسخ الآمن
+│       └── FileIndexingRepositoryImpl.kt # تطبيق مستودع الفهرسة التزايدي والبحث الفوري FTS
 │
 ├── di/                                  # حاوية حقن التبعيات
-│   └── AppContainer.kt                  # توفير Singletons للمستودعات والسمات واللغات وقاعدة البيانات
+│   └── AppContainer.kt                  # توفير Singletons للمستودعات وقاعدة البيانات والـ SAF
 │
 └── ui/                                  # طبقة واجهة المستخدم
     ├── navigation/
@@ -93,9 +106,11 @@ com.xfiles.pro
     ├── components/
     │   └── XFilesTopAppBar.kt           # الشريط العلوي التفاعلي الموحد لجميع الشاشات
     ├── home/
-    │   └── HomeScreen.kt                # الشاشة الرئيسية، بطاقة التخزين، شبكة الوصول السريع، والملفات الأخيرة
+    │   └── HomeScreen.kt                # الشاشة الرئيسية، بطاقة التخزين الحقيقية، شبكة الوصول السريع، والملفات الأخيرة
     ├── files/
-    │   └── FilesScreen.kt               # شاشة استعراض الملفات، شريط المسار، وتبديل القائمة والشبكة
+    │   ├── FilesUiState.kt              # حالة واجهة استعراض الملفات والعمليات
+    │   ├── FilesViewModel.kt            # إدارة منطق التصفح، شريط المسار، وعمليات الملفات
+    │   └── FilesScreen.kt               # شاشة استعراض الملفات، شريط المسار التفاعلي، زر FAB، ونوافذ العمليات
     ├── media/
     │   └── MediaScreen.kt               # شاشة الوسائط مع تبويبات الصور والفيديوهات والصوتيات
     ├── tools/
@@ -121,7 +136,7 @@ com.xfiles.pro
 
 ---
 
-## 3. حزم الاختبارات (`app/src/test/java/com/xfiles/pro/`) — 75 اختباراً ناجحاً بنسبة 100%
+## 3. حزم الاختبارات (`app/src/test/java/com/xfiles/pro/`) — 86 اختباراً ناجحاً بنسبة 100%
 ```text
 com.xfiles.pro
 ├── ExampleUnitTest.kt                           # اختبار عام (1)
@@ -137,7 +152,9 @@ com.xfiles.pro
 │   ├── LanguageRepositoryTest.kt                # اختبارات تدفق وحفظ اللغة وأول تشغيل (4)
 │   ├── ThemeRepositoryTest.kt                   # اختبارات تدفق وحفظ السمات الأربع (3)
 │   ├── RealDataStoreLanguageTest.kt             # اختبارات قرص DataStore لاستعادة اللغة (2)
-│   └── RealDataStoreThemeTest.kt                # اختبارات قرص DataStore لاستعادة السمة والتزامن مع اللغة (4)
+│   ├── RealDataStoreThemeTest.kt                # اختبارات قرص DataStore لاستعادة السمة والتزامن مع اللغة (4)
+│   ├── StorageOperationTest.kt                  # اختبارات عمليات الملفات والـ SAF والأسماء العربية والنسخ الآمن (11)
+│   └── FileIndexingEngineTest.kt                # اختبارات Room FTS والبحث العربي والتزايدي والمزامنة اللحظية (15)
 └── ui/
     ├── LanguageViewModelTest.kt                 # اختبارات إدارة وتدفق حالة لغة ViewModel (4)
     ├── RobolectricLocalizationTest.kt           # اختبارات حل النصوص باللغات الأربع (4)

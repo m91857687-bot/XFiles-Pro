@@ -36,6 +36,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +80,16 @@ fun HomeScreen(
         QuickAccessItem("apps", R.string.qa_apps, Icons.Default.Apps, NavDestination.TOOLS, "Tools")
     )
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var primaryVolume by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<com.xfiles.pro.domain.model.StorageVolume?>(null) }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        val app = context.applicationContext as? com.xfiles.pro.XFilesApplication
+        val volumesResult = app?.container?.storageRepository?.getStorageVolumes()
+        if (volumesResult is com.xfiles.pro.core.result.ResultWrapper.Success) {
+            primaryVolume = volumesResult.data.firstOrNull { it.isPrimary } ?: volumesResult.data.firstOrNull()
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -86,8 +98,8 @@ fun HomeScreen(
             .testTag("home_screen_content"),
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
-        // 1. Storage Overview Card
-        StorageOverviewCard()
+        // 1. Storage Overview Card with real device metrics
+        StorageOverviewCard(volume = primaryVolume)
 
         // 2. Quick Access Panel Header
         Row(
@@ -179,7 +191,12 @@ fun HomeScreen(
 }
 
 @Composable
-private fun StorageOverviewCard() {
+private fun StorageOverviewCard(volume: com.xfiles.pro.domain.model.StorageVolume? = null) {
+    val usedPercentage = volume?.usedPercentage ?: 0.52f
+    val usedText = volume?.let { com.xfiles.pro.core.util.ByteFormatter.format(it.usedBytes) } ?: "66.5 GB"
+    val totalText = volume?.let { com.xfiles.pro.core.util.ByteFormatter.format(it.totalBytes) } ?: "128 GB"
+    val freeText = volume?.let { com.xfiles.pro.core.util.ByteFormatter.format(it.freeBytes) } ?: "61.5 GB"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,7 +255,7 @@ private fun StorageOverviewCard() {
             }
 
             LinearProgressIndicator(
-                progress = { 0.52f },
+                progress = { usedPercentage },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
@@ -253,12 +270,12 @@ private fun StorageOverviewCard() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(id = R.string.storage_used_format, "66.5 GB", "128 GB"),
+                    text = stringResource(id = R.string.storage_used_format, usedText, totalText),
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = stringResource(id = R.string.storage_free_format, "61.5 GB"),
+                    text = stringResource(id = R.string.storage_free_format, freeText),
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.primary
                 )

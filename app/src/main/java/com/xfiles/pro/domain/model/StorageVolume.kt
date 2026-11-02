@@ -10,7 +10,9 @@ data class StorageVolume(
     val totalBytes: Long = 0L,
     val freeBytes: Long = 0L,
     val isPrimary: Boolean = false,
-    val isRemovable: Boolean = false
+    val isRemovable: Boolean = false,
+    val rootUri: String? = null,
+    val state: String = "mounted"
 ) {
     val usedBytes: Long get() = (totalBytes - freeBytes).coerceAtLeast(0L)
     val usedPercentage: Float get() = if (totalBytes > 0) (usedBytes.toFloat() / totalBytes.toFloat()) else 0f

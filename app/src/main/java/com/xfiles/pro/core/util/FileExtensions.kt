@@ -32,4 +32,27 @@ object FileExtensions {
             else -> FileType.UNKNOWN
         }
     }
+
+    fun getMimeType(extension: String): String {
+        return when (extension.lowercase(Locale.ROOT)) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            "svg" -> "image/svg+xml"
+            "mp4" -> "video/mp4"
+            "mkv" -> "video/x-matroska"
+            "webm" -> "video/webm"
+            "mp3" -> "audio/mpeg"
+            "wav" -> "audio/wav"
+            "ogg" -> "audio/ogg"
+            "flac" -> "audio/flac"
+            "pdf" -> "application/pdf"
+            "txt" -> "text/plain"
+            "json" -> "application/json"
+            "zip" -> "application/zip"
+            "apk" -> "application/vnd.android.package-archive"
+            else -> "application/octet-stream"
+        }
+    }
 }

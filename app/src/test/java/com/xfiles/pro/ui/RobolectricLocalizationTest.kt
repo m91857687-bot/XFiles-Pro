@@ -12,7 +12,7 @@ import org.robolectric.annotation.Config
 import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [36])
 class RobolectricLocalizationTest {
 
     private fun getLocalizedContext(context: Context, locale: Locale): Context {
