@@ -35,6 +35,7 @@ interface AppContainer {
     val tabRepository: com.xfiles.pro.domain.repository.TabRepository
     val searchPreferences: com.xfiles.pro.data.local.datastore.SearchPreferences
     val searchHistoryRepository: com.xfiles.pro.domain.repository.SearchHistoryRepository
+    val archiveRepository: com.xfiles.pro.domain.repository.ArchiveRepository
 }
 
 /**
@@ -103,5 +104,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val searchHistoryRepository: com.xfiles.pro.domain.repository.SearchHistoryRepository by lazy {
         com.xfiles.pro.data.repository.SearchHistoryRepositoryImpl(searchPreferences, dispatchersProvider)
+    }
+
+    override val archiveRepository: com.xfiles.pro.domain.repository.ArchiveRepository by lazy {
+        com.xfiles.pro.data.repository.ArchiveRepositoryImpl(dispatchersProvider)
     }
 }

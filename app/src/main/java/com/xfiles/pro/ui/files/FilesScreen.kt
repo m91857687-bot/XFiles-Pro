@@ -75,15 +75,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Unarchive
 import com.xfiles.pro.R
 import com.xfiles.pro.XFilesApplication
 import com.xfiles.pro.core.util.ByteFormatter
 import com.xfiles.pro.domain.model.FileItem
+import com.xfiles.pro.domain.model.FileType
 import com.xfiles.pro.domain.model.PaneId
+import com.xfiles.pro.ui.archive.ArchiveViewerScreen
+import com.xfiles.pro.ui.archive.ArchiveViewModel
+import com.xfiles.pro.ui.archive.components.ArchiveProgressDialog
+import com.xfiles.pro.ui.archive.components.CreateArchiveDialog
+import com.xfiles.pro.ui.archive.components.ExtractArchiveDialog
 import com.xfiles.pro.ui.files.components.AdvancedSearchSheet
 import com.xfiles.pro.ui.files.components.DualPaneFilesView
 import com.xfiles.pro.ui.files.components.FileTabBar
 import com.xfiles.pro.ui.files.components.SearchHistoryView
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -97,11 +106,35 @@ fun FilesScreen(
             (LocalContext.current.applicationContext as XFilesApplication).container.storageRepository,
             (LocalContext.current.applicationContext as XFilesApplication).container.fileIndexingRepository,
             (LocalContext.current.applicationContext as XFilesApplication).container.tabRepository,
-            (LocalContext.current.applicationContext as XFilesApplication).container.searchHistoryRepository
+            (LocalContext.current.applicationContext as XFilesApplication).container.searchHistoryRepository,
+            (LocalContext.current.applicationContext as XFilesApplication).container.archiveRepository
         )
     )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val appContainer = (context.applicationContext as XFilesApplication).container
+
+    if (uiState.archiveFileToView != null) {
+        val archiveFile = File(uiState.archiveFileToView!!.path)
+        val archiveViewModel: ArchiveViewModel = viewModel(
+            key = "archive_viewer_${archiveFile.absolutePath}",
+            factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    return ArchiveViewModel(appContainer.archiveRepository) as T
+                }
+            }
+        )
+        LaunchedEffect(archiveFile) {
+            archiveViewModel.loadArchive(archiveFile)
+        }
+        ArchiveViewerScreen(
+            viewModel = archiveViewModel,
+            onBack = { viewModel.viewArchive(null) }
+        )
+        return
+    }
 
     // Handle back button inside directory hierarchy or search mode
     BackHandler(enabled = uiState.isSearching || uiState.breadcrumbs.size > 1) {
@@ -337,6 +370,15 @@ fun FilesScreen(
                     },
                     leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null) }
                 )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.archive_create_title)) },
+                    onClick = {
+                        showFabMenu = false
+                        viewModel.showCreateArchiveDialog(true)
+                    },
+                    leadingIcon = { Icon(Icons.Default.Archive, contentDescription = null) },
+                    modifier = Modifier.testTag("fab_create_archive_item")
+                )
             }
         }
 
@@ -409,6 +451,41 @@ fun FilesScreen(
             FileDetailsDialog(
                 item = item,
                 onDismiss = { viewModel.selectItemForDetails(null) }
+            )
+        }
+
+        if (uiState.showCreateArchiveDialog) {
+            val currentDir = File(uiState.activePaneState.currentPath)
+            val selectedFiles: List<File> = uiState.activePaneState.selectedItemForAction?.let { listOf(File(it.path)) }
+                ?: listOf(currentDir)
+            CreateArchiveDialog(
+                selectedFiles = selectedFiles,
+                onDismiss = { viewModel.showCreateArchiveDialog(false) },
+                onConfirm = { name, format, level, password ->
+                    viewModel.createArchive(name, format, level, password)
+                }
+            )
+        }
+
+        uiState.archiveFileToExtract?.let { item ->
+            val archiveFile = File(item.path)
+            val destDir = archiveFile.parentFile ?: File(uiState.activePaneState.currentPath)
+            ExtractArchiveDialog(
+                archiveFile = archiveFile,
+                defaultDestinationDir = File(destDir, archiveFile.nameWithoutExtension),
+                hasSelectedEntries = false,
+                onDismiss = { viewModel.showExtractArchiveDialog(null) },
+                onConfirm = { dest, conflict, selectedOnly ->
+                    viewModel.extractArchive(dest, conflict, selectedOnly)
+                }
+            )
+        }
+
+        if (uiState.isArchiveOperationInProgress && uiState.archiveProgress != null) {
+            ArchiveProgressDialog(
+                title = stringResource(R.string.archive_operation_in_progress),
+                progress = uiState.archiveProgress!!,
+                onCancel = { viewModel.cancelArchiveOperation() }
             )
         }
     }
@@ -484,7 +561,9 @@ private fun SinglePaneSection(
                         onClick = { viewModel.navigateInto(item) },
                         onRenameClick = { viewModel.openRenameDialog(item) },
                         onDeleteClick = { viewModel.openDeleteDialog(item) },
-                        onDetailsClick = { viewModel.selectItemForDetails(item) }
+                        onDetailsClick = { viewModel.selectItemForDetails(item) },
+                        onExtractClick = { viewModel.showExtractArchiveDialog(item) },
+                        onCompressClick = { viewModel.showCreateArchiveDialog(true) }
                     )
                 }
             }
@@ -700,7 +779,9 @@ private fun FileListRow(
     onClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onDetailsClick: () -> Unit
+    onDetailsClick: () -> Unit,
+    onExtractClick: () -> Unit = {},
+    onCompressClick: () -> Unit = {}
 ) {
     var expandedMenu by remember { mutableStateOf(false) }
 
@@ -719,9 +800,17 @@ private fun FileListRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = if (item.isDirectory) Icons.Default.Folder else Icons.Default.Folder,
+                imageVector = when {
+                    item.isDirectory -> Icons.Default.Folder
+                    item.fileType == FileType.ARCHIVE -> Icons.Default.Archive
+                    else -> Icons.Default.Folder
+                },
                 contentDescription = null,
-                tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                tint = when {
+                    item.isDirectory -> MaterialTheme.colorScheme.primary
+                    item.fileType == FileType.ARCHIVE -> MaterialTheme.colorScheme.tertiary
+                    else -> MaterialTheme.colorScheme.secondary
+                },
                 modifier = Modifier.size(32.dp)
             )
 
@@ -750,6 +839,32 @@ private fun FileListRow(
                     expanded = expandedMenu,
                     onDismissRequest = { expandedMenu = false }
                 ) {
+                    if (item.fileType == FileType.ARCHIVE) {
+                        DropdownMenuItem(
+                            text = { Text("Open Archive") },
+                            onClick = {
+                                expandedMenu = false
+                                onClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Archive, contentDescription = null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Extract Here") },
+                            onClick = {
+                                expandedMenu = false
+                                onExtractClick()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Unarchive, contentDescription = null) }
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text("Compress") },
+                        onClick = {
+                            expandedMenu = false
+                            onCompressClick()
+                        },
+                        leadingIcon = { Icon(Icons.Default.Archive, contentDescription = null) }
+                    )
                     DropdownMenuItem(
                         text = { Text("Details") },
                         onClick = {

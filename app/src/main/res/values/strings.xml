@@ -152,4 +152,34 @@
     <string name="dual_pane_secondary">Secondary Pane</string>
     <string name="dual_pane_copy_to_other">Copy to Other Pane</string>
     <string name="dual_pane_move_to_other">Move to Other Pane</string>
+
+    <!-- Phase 7 Archive Management Strings -->
+    <string name="btn_back">Back</string>
+    <string name="search_hint">Search</string>
+    <string name="search_no_results">No results found</string>
+    <string name="archive_create_title">Create Archive</string>
+    <string name="archive_extract_title">Extract Archive</string>
+    <string name="archive_name_label">Archive Name</string>
+    <string name="archive_format_label">Archive Format</string>
+    <string name="archive_compression_level">Compression Level</string>
+    <string name="archive_password_optional">Password Protection (Optional)</string>
+    <string name="archive_password_label">Password</string>
+    <string name="archive_create_confirm">Create</string>
+    <string name="archive_extract_destination">Destination Folder</string>
+    <string name="archive_extract_all">Extract All</string>
+    <string name="archive_extract_selected">Extract Selected</string>
+    <string name="archive_extract_confirm">Extract</string>
+    <string name="conflict_resolution_label">On File Conflict</string>
+    <string name="conflict_auto_rename">Auto Rename</string>
+    <string name="conflict_overwrite">Overwrite</string>
+    <string name="conflict_skip">Skip</string>
+    <string name="archive_file_label">Archive</string>
+    <string name="archive_password_required_title">Password Protected</string>
+    <string name="archive_password_prompt_desc">Enter the password to unlock \'%1$s\'</string>
+    <string name="archive_operation_in_progress">Processing Archive…</string>
+    <string name="archive_viewer_title">Archive Viewer</string>
+    <string name="search_in_archive_hint">Search in archive…</string>
+    <string name="archive_empty">Archive is empty</string>
+    <string name="select_all">Select All</string>
+    <string name="clear_selection">Clear Selection</string>
 </resources>

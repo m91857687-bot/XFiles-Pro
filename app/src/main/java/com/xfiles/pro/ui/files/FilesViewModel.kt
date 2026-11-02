@@ -39,7 +39,8 @@ class FilesViewModel(
     private val storageRepository: StorageRepository,
     private val fileIndexingRepository: FileIndexingRepository,
     private val tabRepository: TabRepository,
-    private val searchHistoryRepository: SearchHistoryRepository
+    private val searchHistoryRepository: SearchHistoryRepository,
+    private val archiveRepository: com.xfiles.pro.domain.repository.ArchiveRepository? = null
 ) : ViewModel() {
 
     val rootPath: String by lazy {
@@ -376,6 +377,8 @@ class FilesViewModel(
                 clearSearch()
             }
             loadDirectory(item.path, paneId)
+        } else if (item.fileType == FileType.ARCHIVE) {
+            viewArchive(item)
         }
     }
 
@@ -716,12 +719,147 @@ class FilesViewModel(
         return crumbs
     }
 
+    // Archive Management Operations
+    fun showCreateArchiveDialog(show: Boolean) {
+        _uiState.update { it.copy(showCreateArchiveDialog = show) }
+    }
+
+    fun showExtractArchiveDialog(file: FileItem?) {
+        _uiState.update { it.copy(archiveFileToExtract = file) }
+    }
+
+    fun viewArchive(file: FileItem?) {
+        _uiState.update { it.copy(archiveFileToView = file) }
+    }
+
+    fun createArchive(
+        name: String,
+        format: com.xfiles.pro.domain.model.ArchiveFormat,
+        level: com.xfiles.pro.domain.model.CompressionLevel,
+        password: String?
+    ) {
+        val repo = archiveRepository ?: return
+        val currentPane = _uiState.value.activePaneState
+        val selectedFiles: List<File> = currentPane.selectedItemForAction?.let { listOf(File(it.path)) }
+            ?: listOf(File(currentPane.currentPath))
+        val targetFile = File(currentPane.currentPath, "$name.${format.extension}")
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    showCreateArchiveDialog = false,
+                    isArchiveOperationInProgress = true,
+                    archiveProgress = com.xfiles.pro.domain.model.ArchiveProgress(currentItem = targetFile.name, percentage = 0f)
+                )
+            }
+
+            val result = repo.createArchive(
+                sourceFiles = selectedFiles,
+                destinationArchiveFile = targetFile,
+                format = format,
+                compressionLevel = level,
+                password = password,
+                onProgress = { progress ->
+                    _uiState.update { it.copy(archiveProgress = progress) }
+                }
+            )
+
+            when (result) {
+                is ResultWrapper.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isArchiveOperationInProgress = false,
+                            archiveProgress = null,
+                            operationSuccessMessage = "Archive created: ${targetFile.name}"
+                        )
+                    }
+                    loadDirectory(_uiState.value.activePaneState.currentPath, _uiState.value.activePaneId)
+                }
+                is ResultWrapper.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isArchiveOperationInProgress = false,
+                            archiveProgress = null,
+                            operationErrorMessage = result.message
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun extractArchive(
+        destinationDir: File,
+        conflictResolution: FileConflictResolution = FileConflictResolution.AUTO_RENAME,
+        selectedOnly: Boolean = false,
+        password: String? = null
+    ) {
+        val repo = archiveRepository ?: return
+        val archiveItem = _uiState.value.archiveFileToExtract ?: return
+        val archiveFile = File(archiveItem.path)
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    archiveFileToExtract = null,
+                    isArchiveOperationInProgress = true,
+                    archiveProgress = com.xfiles.pro.domain.model.ArchiveProgress(currentItem = archiveFile.name, percentage = 0f)
+                )
+            }
+
+            val result = repo.extractArchive(
+                archiveFile = archiveFile,
+                destinationDir = destinationDir,
+                password = password,
+                conflictResolution = conflictResolution,
+                onProgress = { progress ->
+                    _uiState.update { it.copy(archiveProgress = progress) }
+                }
+            )
+
+            when (result) {
+                is ResultWrapper.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isArchiveOperationInProgress = false,
+                            archiveProgress = null,
+                            operationSuccessMessage = "Extracted ${result.data} files successfully"
+                        )
+                    }
+                    loadDirectory(_uiState.value.activePaneState.currentPath, _uiState.value.activePaneId)
+                }
+                is ResultWrapper.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isArchiveOperationInProgress = false,
+                            archiveProgress = null,
+                            operationErrorMessage = result.message
+                        )
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun cancelArchiveOperation() {
+        _uiState.update {
+            it.copy(
+                isArchiveOperationInProgress = false,
+                archiveProgress = null,
+                operationErrorMessage = "Archive operation cancelled"
+            )
+        }
+    }
+
     companion object {
         fun provideFactory(
             storageRepository: StorageRepository,
             fileIndexingRepository: FileIndexingRepository,
             tabRepository: TabRepository,
-            searchHistoryRepository: SearchHistoryRepository
+            searchHistoryRepository: SearchHistoryRepository,
+            archiveRepository: com.xfiles.pro.domain.repository.ArchiveRepository? = null
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -730,7 +868,8 @@ class FilesViewModel(
                         storageRepository,
                         fileIndexingRepository,
                         tabRepository,
-                        searchHistoryRepository
+                        searchHistoryRepository,
+                        archiveRepository
                     ) as T
                 }
             }

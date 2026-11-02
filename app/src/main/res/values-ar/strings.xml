@@ -152,4 +152,34 @@
     <string name="dual_pane_secondary">اللوح الثانوي</string>
     <string name="dual_pane_copy_to_other">نسخ إلى اللوح الآخر</string>
     <string name="dual_pane_move_to_other">نقل إلى اللوح الآخر</string>
+
+    <!-- Phase 7 Archive Management Strings -->
+    <string name="btn_back">رجوع</string>
+    <string name="search_hint">بحث</string>
+    <string name="search_no_results">لا توجد نتائج</string>
+    <string name="archive_create_title">إنشاء أرشيف</string>
+    <string name="archive_extract_title">استخراج الأرشيف</string>
+    <string name="archive_name_label">اسم الأرشيف</string>
+    <string name="archive_format_label">صيغة الأرشيف</string>
+    <string name="archive_compression_level">مستوى الضغط</string>
+    <string name="archive_password_optional">كلمة المرور (اختياري)</string>
+    <string name="archive_password_label">كلمة المرور</string>
+    <string name="archive_create_confirm">إنشاء</string>
+    <string name="archive_extract_destination">مجلد الوجهة</string>
+    <string name="archive_extract_all">استخراج الكل</string>
+    <string name="archive_extract_selected">استخراج المحدد</string>
+    <string name="archive_extract_confirm">استخراج</string>
+    <string name="conflict_resolution_label">عند تعارض الأسماء</string>
+    <string name="conflict_auto_rename">إعادة تسمية تلقائياً</string>
+    <string name="conflict_overwrite">استبدال</string>
+    <string name="conflict_skip">تخطي</string>
+    <string name="archive_file_label">الأرشيف</string>
+    <string name="archive_password_required_title">أرشيف محمي بكلمة مرور</string>
+    <string name="archive_password_prompt_desc">أدخل كلمة المرور لفتح \'%1$s\'</string>
+    <string name="archive_operation_in_progress">جارٍ معالجة الأرشيف…</string>
+    <string name="archive_viewer_title">مستعرض الأرشيف</string>
+    <string name="search_in_archive_hint">بحث داخل الأرشيف…</string>
+    <string name="archive_empty">الأرشيف فارغ</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="clear_selection">إلغاء التحديد</string>
 </resources>

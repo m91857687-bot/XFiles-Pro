@@ -152,4 +152,34 @@
     <string name="dual_pane_secondary">پنل دوم</string>
     <string name="dual_pane_copy_to_other">کپی به پنل دیگر</string>
     <string name="dual_pane_move_to_other">انتقال به پنل دیگر</string>
+
+    <!-- Phase 7 Archive Management Strings -->
+    <string name="btn_back">بازگشت</string>
+    <string name="search_hint">جستجو</string>
+    <string name="search_no_results">نتیجه‌ای یافت نشد</string>
+    <string name="archive_create_title">ایجاد آرشیو</string>
+    <string name="archive_extract_title">استخراج آرشیو</string>
+    <string name="archive_name_label">نام آرشیو</string>
+    <string name="archive_format_label">فرمت آرشیو</string>
+    <string name="archive_compression_level">سطح فشرده‌سازی</string>
+    <string name="archive_password_optional">رمز عبور (اختیاری)</string>
+    <string name="archive_password_label">رمز عبور</string>
+    <string name="archive_create_confirm">ایجاد</string>
+    <string name="archive_extract_destination">پوشه مقصد</string>
+    <string name="archive_extract_all">استخراج همه</string>
+    <string name="archive_extract_selected">استخراج انتخاب شده‌ها</string>
+    <string name="archive_extract_confirm">استخراج</string>
+    <string name="conflict_resolution_label">در صورت تداخل نام</string>
+    <string name="conflict_auto_rename">تغییر نام خودکار</string>
+    <string name="conflict_overwrite">جایگزینی</string>
+    <string name="conflict_skip">رد کردن</string>
+    <string name="archive_file_label">آرشیو</string>
+    <string name="archive_password_required_title">آرشیو محافظت شده با رمز</string>
+    <string name="archive_password_prompt_desc">رمز عبور را برای بازگشایی \'%1$s\' وارد کنید</string>
+    <string name="archive_operation_in_progress">در حال پردازش آرشیو…</string>
+    <string name="archive_viewer_title">نمایشگر آرشیو</string>
+    <string name="search_in_archive_hint">جستجو در آرشیو…</string>
+    <string name="archive_empty">آرشیو خالی است</string>
+    <string name="select_all">انتخاب همه</string>
+    <string name="clear_selection">پاک کردن انتخاب</string>
 </resources>

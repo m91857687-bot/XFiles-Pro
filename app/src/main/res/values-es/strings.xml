@@ -152,4 +152,34 @@
     <string name="dual_pane_secondary">Panel secundario</string>
     <string name="dual_pane_copy_to_other">Copiar al otro panel</string>
     <string name="dual_pane_move_to_other">Mover al otro panel</string>
+
+    <!-- Phase 7 Archive Management Strings -->
+    <string name="btn_back">Atrás</string>
+    <string name="search_hint">Buscar</string>
+    <string name="search_no_results">No se encontraron resultados</string>
+    <string name="archive_create_title">Crear archivo</string>
+    <string name="archive_extract_title">Extraer archivo</string>
+    <string name="archive_name_label">Nombre del archivo</string>
+    <string name="archive_format_label">Formato de archivo</string>
+    <string name="archive_compression_level">Nivel de compresión</string>
+    <string name="archive_password_optional">Protección con contraseña (opcional)</string>
+    <string name="archive_password_label">Contraseña</string>
+    <string name="archive_create_confirm">Crear</string>
+    <string name="archive_extract_destination">Carpeta de destino</string>
+    <string name="archive_extract_all">Extraer todo</string>
+    <string name="archive_extract_selected">Extraer seleccionados</string>
+    <string name="archive_extract_confirm">Extraer</string>
+    <string name="conflict_resolution_label">En conflicto de archivos</string>
+    <string name="conflict_auto_rename">Renombrar automáticamente</string>
+    <string name="conflict_overwrite">Sobrescribir</string>
+    <string name="conflict_skip">Omitir</string>
+    <string name="archive_file_label">Archivo</string>
+    <string name="archive_password_required_title">Protegido con contraseña</string>
+    <string name="archive_password_prompt_desc">Introduce la contraseña para desbloquear \'%1$s\'</string>
+    <string name="archive_operation_in_progress">Procesando archivo…</string>
+    <string name="archive_viewer_title">Visor de archivos</string>
+    <string name="search_in_archive_hint">Buscar en el archivo…</string>
+    <string name="archive_empty">El archivo está vacío</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="clear_selection">Borrar selección</string>
 </resources>

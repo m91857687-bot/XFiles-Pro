@@ -47,6 +47,11 @@ data class FilesUiState(
     val showCreateFileDialog: Boolean = false,
     val itemToRename: FileItem? = null,
     val itemToDelete: FileItem? = null,
+    val showCreateArchiveDialog: Boolean = false,
+    val archiveFileToExtract: FileItem? = null,
+    val archiveFileToView: FileItem? = null,
+    val isArchiveOperationInProgress: Boolean = false,
+    val archiveProgress: com.xfiles.pro.domain.model.ArchiveProgress? = null,
     val operationSuccessMessage: String? = null,
     val operationErrorMessage: String? = null
 ) {
