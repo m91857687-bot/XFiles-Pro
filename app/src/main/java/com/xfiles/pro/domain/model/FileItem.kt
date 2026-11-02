@@ -1,5 +1,8 @@
 package com.xfiles.pro.domain.model
 
+import com.xfiles.pro.core.util.ByteFormatter
+import java.io.File
+
 /**
  * Core domain representation of a file system item.
  */
@@ -15,4 +18,10 @@ data class FileItem(
     val isHidden: Boolean = false,
     val canRead: Boolean = true,
     val canWrite: Boolean = true
-)
+) {
+    val formattedSize: String
+        get() = ByteFormatter.format(size)
+
+    val parentPath: String
+        get() = File(path).parent ?: ""
+}

@@ -15,8 +15,10 @@ import com.xfiles.pro.data.local.storage.MediaStoreManager
 import com.xfiles.pro.data.local.storage.SafManager
 import com.xfiles.pro.data.worker.FileIndexingWorker
 import com.xfiles.pro.domain.model.FileItem
+import com.xfiles.pro.domain.model.FileSortOption
 import com.xfiles.pro.domain.model.FileType
 import com.xfiles.pro.domain.model.IndexingState
+import com.xfiles.pro.domain.model.SearchFilterCriteria
 import com.xfiles.pro.domain.model.StorageEvent
 import com.xfiles.pro.domain.repository.FileIndexingRepository
 import com.xfiles.pro.domain.repository.StorageRepository
@@ -135,6 +137,74 @@ class FileIndexingRepositoryImpl(
             }
 
             combined.values.map { it.toFileItem() }
+        }.flowOn(dispatchers.io)
+    }
+
+    override fun searchFilesAdvanced(criteria: SearchFilterCriteria): Flow<List<FileItem>> {
+        val trimmed = criteria.query.trim()
+        val categoryFilter = criteria.fileType?.name
+        val extensionFilter = criteria.extension?.trim()?.removePrefix(".")?.takeIf { it.isNotEmpty() }
+        val minSize = criteria.sizeRange.minBytes
+        val maxSize = criteria.sizeRange.maxBytes
+        val minLastModified = criteria.dateRange.getCutoffTimestamp()
+
+        val sanitizedFts = trimmed.replace(Regex("[*\"'():;^~{}\\[\\]]"), " ").trim()
+        val ftsMatchQuery = if (sanitizedFts.isNotEmpty()) {
+            sanitizedFts.split("\\s+".toRegex()).joinToString(" ") { "$it*" }
+        } else {
+            ""
+        }
+
+        val ftsFlow = if (ftsMatchQuery.isNotEmpty()) {
+            indexedFileDao.searchAdvancedFts(
+                matchQuery = ftsMatchQuery,
+                category = categoryFilter,
+                extension = extensionFilter,
+                minSize = minSize,
+                maxSize = maxSize,
+                minLastModified = minLastModified
+            )
+        } else {
+            flow { emit(emptyList()) }
+        }
+
+        val likeFlow = indexedFileDao.searchAdvancedLike(
+            query = trimmed,
+            category = categoryFilter,
+            extension = extensionFilter,
+            minSize = minSize,
+            maxSize = maxSize,
+            minLastModified = minLastModified
+        )
+
+        return combine(ftsFlow, likeFlow) { ftsList, likeList ->
+            val combined = LinkedHashMap<String, IndexedFileEntity>()
+            for (entity in ftsList) {
+                combined[entity.path] = entity
+            }
+            for (entity in likeList) {
+                if (!combined.containsKey(entity.path)) {
+                    combined[entity.path] = entity
+                }
+            }
+
+            val items = combined.values
+                .filter { entity ->
+                    val targetMatch = criteria.searchTarget.matches(entity.isDirectory)
+                    val scopeMatch = criteria.scopePath.isNullOrBlank() || entity.path.startsWith(criteria.scopePath)
+                    targetMatch && scopeMatch
+                }
+                .map { it.toFileItem() }
+            val comparator: Comparator<FileItem> = when (criteria.sortOption) {
+                FileSortOption.NAME_ASC -> compareBy({ !it.isDirectory }, { it.name.lowercase() })
+                FileSortOption.NAME_DESC -> compareBy<FileItem>({ !it.isDirectory }).thenByDescending { it.name.lowercase() }
+                FileSortOption.DATE_ASC -> compareBy({ !it.isDirectory }, { it.lastModified })
+                FileSortOption.DATE_DESC -> compareBy<FileItem>({ !it.isDirectory }).thenByDescending { it.lastModified }
+                FileSortOption.SIZE_ASC -> compareBy({ !it.isDirectory }, { it.size })
+                FileSortOption.SIZE_DESC -> compareBy<FileItem>({ !it.isDirectory }).thenByDescending { it.size }
+                FileSortOption.TYPE_ASC -> compareBy({ !it.isDirectory }, { it.extension.lowercase() }, { it.name.lowercase() })
+            }
+            items.sortedWith(comparator)
         }.flowOn(dispatchers.io)
     }
 

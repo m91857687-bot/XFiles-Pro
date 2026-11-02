@@ -111,5 +111,45 @@
     <string name="settings_app_name">XFiles Pro Administrador de archivos</string>
     <string name="settings_app_version">Versión 1.0.0-alpha.4</string>
     <string name="settings_app_architecture">Arquitectura: Clean Architecture + M3</string>
-    <string name="settings_active_phase">Fase 4: Estructura de interfaz y navegación activa</string>
+    <string name="settings_active_phase">Fase 6: Búsqueda avanzada, pestañas múltiples y panel doble activos</string>
+
+    <!-- Phase 6 Multi-Tabs Strings -->
+    <string name="tab_new">Nueva pestaña</string>
+    <string name="tab_close">Cerrar pestaña</string>
+    <string name="tab_close_others">Cerrar otras pestañas</string>
+
+    <!-- Phase 6 Advanced Search Strings -->
+    <string name="filter_title">Filtros de búsqueda</string>
+    <string name="filter_category">Categoría</string>
+    <string name="filter_size">Rango de tamaño</string>
+    <string name="filter_date">Fecha modificada</string>
+    <string name="filter_target">Tipo de elemento</string>
+    <string name="filter_target_both">Archivos y carpetas</string>
+    <string name="filter_target_files">Solo archivos</string>
+    <string name="filter_target_folders">Solo carpetas</string>
+    <string name="filter_clear_all">Restablecer filtros</string>
+    <string name="filter_apply">Aplicar filtros</string>
+    <string name="search_recent_title">Búsquedas recientes</string>
+    <string name="search_clear_history">Borrar historial</string>
+    <string name="search_open_parent">Abrir carpeta contenedora</string>
+    <string name="search_open_new_tab">Abrir en nueva pestaña</string>
+    <string name="search_scope_current">Solo carpeta actual</string>
+    <string name="search_scope_all">Todo el almacenamiento</string>
+    <string name="size_any">Cualquier tamaño</string>
+    <string name="size_tiny">&lt; 1 MB</string>
+    <string name="size_medium">1 - 50 MB</string>
+    <string name="size_large">50 - 500 MB</string>
+    <string name="size_huge">&gt; 500 MB</string>
+    <string name="date_any">Cualquier fecha</string>
+    <string name="date_today">Últimas 24 horas</string>
+    <string name="date_week">Últimos 7 días</string>
+    <string name="date_month">Últimos 30 días</string>
+    <string name="date_year">Este año</string>
+
+    <!-- Phase 6 Dual Pane Strings -->
+    <string name="dual_pane_toggle">Panel doble</string>
+    <string name="dual_pane_primary">Panel principal</string>
+    <string name="dual_pane_secondary">Panel secundario</string>
+    <string name="dual_pane_copy_to_other">Copiar al otro panel</string>
+    <string name="dual_pane_move_to_other">Mover al otro panel</string>
 </resources>

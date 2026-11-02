@@ -31,6 +31,10 @@ interface AppContainer {
     val languageRepository: LanguageRepository
     val themePreferences: ThemePreferences
     val themeRepository: ThemeRepository
+    val tabPreferences: com.xfiles.pro.data.local.datastore.TabPreferences
+    val tabRepository: com.xfiles.pro.domain.repository.TabRepository
+    val searchPreferences: com.xfiles.pro.data.local.datastore.SearchPreferences
+    val searchHistoryRepository: com.xfiles.pro.domain.repository.SearchHistoryRepository
 }
 
 /**
@@ -83,5 +87,21 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val themeRepository: ThemeRepository by lazy {
         ThemeRepositoryImpl(themePreferences, dispatchersProvider)
+    }
+
+    override val tabPreferences: com.xfiles.pro.data.local.datastore.TabPreferences by lazy {
+        com.xfiles.pro.data.local.datastore.TabPreferences(context)
+    }
+
+    override val tabRepository: com.xfiles.pro.domain.repository.TabRepository by lazy {
+        com.xfiles.pro.data.repository.TabRepositoryImpl(tabPreferences, dispatchersProvider)
+    }
+
+    override val searchPreferences: com.xfiles.pro.data.local.datastore.SearchPreferences by lazy {
+        com.xfiles.pro.data.local.datastore.SearchPreferences(context)
+    }
+
+    override val searchHistoryRepository: com.xfiles.pro.domain.repository.SearchHistoryRepository by lazy {
+        com.xfiles.pro.data.repository.SearchHistoryRepositoryImpl(searchPreferences, dispatchersProvider)
     }
 }

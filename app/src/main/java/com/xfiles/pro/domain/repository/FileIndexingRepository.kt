@@ -29,6 +29,12 @@ interface FileIndexingRepository {
     fun searchFiles(query: String, fileType: FileType? = null): Flow<List<FileItem>>
 
     /**
+     * Advanced multi-criteria search combining FTS matching with size, date,
+     * category, extension filters, and sorting.
+     */
+    fun searchFilesAdvanced(criteria: com.xfiles.pro.domain.model.SearchFilterCriteria): Flow<List<FileItem>>
+
+    /**
      * Retrieve files by parent directory path directly from the index.
      */
     fun getFilesByParent(parentPath: String): Flow<List<FileItem>>

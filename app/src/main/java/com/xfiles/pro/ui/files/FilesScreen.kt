@@ -1,11 +1,11 @@
 package com.xfiles.pro.ui.files
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
@@ -30,37 +29,37 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.NoteAdd
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.VideoFile
+import androidx.compose.material.icons.filled.ViewSidebar
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,21 +67,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xfiles.pro.R
 import com.xfiles.pro.XFilesApplication
 import com.xfiles.pro.core.util.ByteFormatter
 import com.xfiles.pro.domain.model.FileItem
-import com.xfiles.pro.domain.model.FileType
+import com.xfiles.pro.domain.model.PaneId
+import com.xfiles.pro.ui.files.components.AdvancedSearchSheet
+import com.xfiles.pro.ui.files.components.DualPaneFilesView
+import com.xfiles.pro.ui.files.components.FileTabBar
+import com.xfiles.pro.ui.files.components.SearchHistoryView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -94,7 +95,9 @@ fun FilesScreen(
     viewModel: FilesViewModel = viewModel(
         factory = FilesViewModel.provideFactory(
             (LocalContext.current.applicationContext as XFilesApplication).container.storageRepository,
-            (LocalContext.current.applicationContext as XFilesApplication).container.fileIndexingRepository
+            (LocalContext.current.applicationContext as XFilesApplication).container.fileIndexingRepository,
+            (LocalContext.current.applicationContext as XFilesApplication).container.tabRepository,
+            (LocalContext.current.applicationContext as XFilesApplication).container.searchHistoryRepository
         )
     )
 ) {
@@ -109,18 +112,21 @@ fun FilesScreen(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize().testTag("files_screen_container")) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize().testTag("files_screen_container")) {
+        val isWideScreen = maxWidth >= 600.dp
+        val showDualPane = isWideScreen || uiState.isDualPaneMode
+
         Column(modifier = Modifier.fillMaxSize()) {
-            // Search Bar & Indexing Controls
+            // 1. Search Bar & Action Controls
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 OutlinedTextField(
-                    value = uiState.searchQuery,
+                    value = uiState.searchCriteria.query,
                     onValueChange = { viewModel.onSearchQueryChange(it) },
                     modifier = Modifier
                         .weight(1f)
@@ -128,7 +134,7 @@ fun FilesScreen(
                     placeholder = {
                         Text(
                             text = if (uiState.totalIndexedCount > 0) {
-                                "Search ${uiState.totalIndexedCount} indexed files..."
+                                "Search ${uiState.totalIndexedCount} files..."
                             } else {
                                 "Search files..."
                             },
@@ -139,7 +145,7 @@ fun FilesScreen(
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                     },
                     trailingIcon = {
-                        if (uiState.searchQuery.isNotEmpty()) {
+                        if (uiState.searchCriteria.query.isNotEmpty()) {
                             IconButton(
                                 onClick = { viewModel.clearSearch() },
                                 modifier = Modifier.testTag("files_search_clear_button")
@@ -152,6 +158,43 @@ fun FilesScreen(
                     shape = RoundedCornerShape(12.dp)
                 )
 
+                // Filter Button with Badge if filters are active
+                BadgedBox(
+                    badge = {
+                        if (uiState.searchCriteria.isFilteringActive) {
+                            Badge { Text("!") }
+                        }
+                    }
+                ) {
+                    IconButton(
+                        onClick = { viewModel.toggleFilterSheet(true) },
+                        modifier = Modifier.testTag("files_filter_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = stringResource(R.string.filter_title),
+                            tint = if (uiState.searchCriteria.isFilteringActive) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                }
+
+                // Dual Pane Toggle Button
+                IconButton(
+                    onClick = { viewModel.toggleDualPaneMode() },
+                    modifier = Modifier.testTag("files_dual_pane_toggle")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ViewSidebar,
+                        contentDescription = stringResource(R.string.dual_pane_toggle),
+                        tint = if (showDualPane) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Manual Index Refresh Button
                 IconButton(
                     onClick = { viewModel.triggerManualIndexing(forceRescan = false) },
                     modifier = Modifier.testTag("files_index_refresh_button")
@@ -164,138 +207,101 @@ fun FilesScreen(
                 }
             }
 
-            // Indexing progress indicator
+            // 2. Multi-Tab Bar
+            FileTabBar(
+                tabs = uiState.tabs,
+                activeTabIndex = uiState.activeTabIndex,
+                onTabSelected = { viewModel.switchTab(it) },
+                onTabClosed = { viewModel.closeTab(it) },
+                onCloseOthers = { viewModel.closeOtherTabs() },
+                onNewTabClick = { viewModel.openNewTab() }
+            )
+
+            // 3. Progress Indicators (Indexing & Transfer)
             if (uiState.indexingState.isIndexing) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 2.dp)
+                LinearProgressIndicator(
+                    progress = { uiState.indexingState.progress },
+                    modifier = Modifier.fillMaxWidth().height(3.dp)
+                )
+            }
+            if (uiState.isTransferring) {
+                LinearProgressIndicator(
+                    progress = { uiState.transferProgress },
+                    modifier = Modifier.fillMaxWidth().height(3.dp),
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+
+            // 4. Status / Operation Banner
+            uiState.operationSuccessMessage?.let { msg ->
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    LinearProgressIndicator(
-                        progress = { uiState.indexingState.progress },
-                        modifier = Modifier.fillMaxWidth().height(4.dp)
-                    )
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Indexing ${uiState.indexingState.currentVolume ?: ""}...",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        TextButton(
-                            onClick = { viewModel.cancelIndexing() },
-                            contentPadding = PaddingValues(0.dp)
-                        ) {
-                            Text("Cancel", style = MaterialTheme.typography.labelSmall)
+                        Text(text = msg, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        IconButton(onClick = { viewModel.clearOperationMessage() }, modifier = Modifier.size(20.dp)) {
+                            Icon(Icons.Default.Close, contentDescription = "Dismiss", modifier = Modifier.size(14.dp))
                         }
                     }
                 }
             }
 
-            // Display Breadcrumbs when browsing normally
-            if (!uiState.isSearching) {
-                BreadcrumbBar(
-                    breadcrumbs = uiState.breadcrumbs,
-                    onBreadcrumbClick = { path -> viewModel.navigateToBreadcrumb(path) }
+            // 5. Main Area: Search Results OR Recent History OR Directory Browsing
+            if (uiState.isSearching) {
+                SearchResultsView(
+                    query = uiState.searchCriteria.query,
+                    results = uiState.searchResults,
+                    onFileClick = { item -> viewModel.navigateInto(item) },
+                    onOpenParentFolder = { item -> viewModel.navigateToParentFolder(item) },
+                    onOpenInNewTab = { item -> viewModel.openSearchResultInNewTab(item) },
+                    onCopyToOtherPane = { item -> viewModel.copyFileToOtherPane(item) },
+                    onClearSearch = { viewModel.clearSearch() }
                 )
             } else {
-                // Search Results Header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Results (${uiState.searchResults.size})",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                // If not searching, show recent search history when query field is touched, or file browsing
+                if (uiState.searchCriteria.query.isEmpty() && uiState.searchHistory.isNotEmpty() && uiState.isSearchHistoryVisible) {
+                    SearchHistoryView(
+                        history = uiState.searchHistory,
+                        onQueryClick = { viewModel.rerunRecentSearch(it) },
+                        onRemoveQuery = { viewModel.removeSearchFromHistory(it) },
+                        onClearAll = { viewModel.clearSearchHistory() }
                     )
-                    TextButton(onClick = { viewModel.clearSearch() }) {
-                        Text("Exit Search", style = MaterialTheme.typography.labelMedium)
-                    }
                 }
-            }
 
-            // File Listing / Search Results / Loading State
-            val displayFiles = if (uiState.isSearching) uiState.searchResults else uiState.files
-
-            if (uiState.isLoading && !uiState.isSearching) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(modifier = Modifier.testTag("files_loading_indicator"))
-                }
-            } else if (displayFiles.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (uiState.isSearching) Icons.Default.Search else Icons.Default.Folder,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.outlineVariant,
-                            modifier = Modifier.size(56.dp)
-                        )
-                        Text(
-                            text = if (uiState.isSearching) {
-                                "No files found matching '${uiState.searchQuery}'"
-                            } else {
-                                "This folder is empty"
-                            },
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            } else if (isGridView || uiState.isGridView) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 130.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag("files_grid_view")
-                ) {
-                    items(displayFiles, key = { it.path }) { item ->
-                        FileGridCard(
-                            item = item,
-                            onClick = { viewModel.navigateInto(item) }
-                        )
-                    }
-                }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(if (uiState.isSearching) "files_search_results_view" else "files_list_view")
-                ) {
-                    items(displayFiles, key = { it.path }) { item ->
-                        FileListRow(
-                            item = item,
-                            onClick = { viewModel.navigateInto(item) },
-                            onRenameClick = { viewModel.openRenameDialog(item) },
-                            onDeleteClick = { viewModel.openDeleteDialog(item) },
-                            onDetailsClick = { viewModel.selectItemForDetails(item) }
-                        )
-                    }
+                // File Browsing Area: Dual Pane vs Single Pane
+                if (showDualPane) {
+                    DualPaneFilesView(
+                        primaryPane = uiState.primaryPane,
+                        secondaryPane = uiState.secondaryPane,
+                        activePaneId = uiState.activePaneId,
+                        onSetActivePane = { viewModel.setActivePane(it) },
+                        onNavigateInto = { item, pane -> viewModel.navigateInto(item, pane) },
+                        onBreadcrumbClick = { path, pane -> viewModel.navigateToBreadcrumb(path, pane) },
+                        onRenameClick = { item, pane -> viewModel.openRenameDialog(item) },
+                        onDeleteClick = { item, pane -> viewModel.openDeleteDialog(item) },
+                        onDetailsClick = { item, pane -> viewModel.selectItemForDetails(item, pane) },
+                        onCopyToOther = { item -> viewModel.copyFileToOtherPane(item) },
+                        onMoveToOther = { item -> viewModel.moveFileToOtherPane(item) },
+                        modifier = Modifier.weight(1f)
+                    )
+                } else {
+                    SinglePaneSection(
+                        uiState = uiState,
+                        isGridView = isGridView,
+                        viewModel = viewModel,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
 
-        // Floating Action Button for Creating Folder/File
+        // FAB for Creating Folder / File
         var showFabMenu by remember { mutableStateOf(false) }
         Box(
             modifier = Modifier
@@ -332,6 +338,21 @@ fun FilesScreen(
                     leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null) }
                 )
             }
+        }
+
+        // Advanced Search Filter Bottom Sheet
+        if (uiState.showFilterSheet) {
+            AdvancedSearchSheet(
+                criteria = uiState.searchCriteria,
+                currentFolderPath = uiState.activePaneState.currentPath,
+                onCategorySelected = { viewModel.setFileTypeFilter(it) },
+                onSizeSelected = { viewModel.setSizeFilter(it) },
+                onDateSelected = { viewModel.setDateFilter(it) },
+                onTargetSelected = { viewModel.setSearchTarget(it) },
+                onScopeSelected = { viewModel.setSearchScope(it) },
+                onClearFilters = { viewModel.clearFilters() },
+                onDismiss = { viewModel.toggleFilterSheet(false) }
+            )
         }
 
         // Dialogs
@@ -389,6 +410,233 @@ fun FilesScreen(
                 item = item,
                 onDismiss = { viewModel.selectItemForDetails(null) }
             )
+        }
+    }
+}
+
+@Composable
+private fun SinglePaneSection(
+    uiState: FilesUiState,
+    isGridView: Boolean,
+    viewModel: FilesViewModel,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxSize()) {
+        BreadcrumbBar(
+            breadcrumbs = uiState.breadcrumbs,
+            onBreadcrumbClick = { path -> viewModel.navigateToBreadcrumb(path) }
+        )
+
+        val displayFiles = uiState.files
+
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(modifier = Modifier.testTag("files_loading_indicator"))
+            }
+        } else if (displayFiles.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Folder,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.outlineVariant,
+                        modifier = Modifier.size(56.dp)
+                    )
+                    Text(
+                        text = "This folder is empty",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else if (isGridView || uiState.isGridView) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 130.dp),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize().testTag("files_grid_view")
+            ) {
+                items(displayFiles, key = { it.path }) { item ->
+                    FileGridCard(
+                        item = item,
+                        onClick = { viewModel.navigateInto(item) }
+                    )
+                }
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize().testTag("files_list_view")
+            ) {
+                items(displayFiles, key = { it.path }) { item ->
+                    FileListRow(
+                        item = item,
+                        onClick = { viewModel.navigateInto(item) },
+                        onRenameClick = { viewModel.openRenameDialog(item) },
+                        onDeleteClick = { viewModel.openDeleteDialog(item) },
+                        onDetailsClick = { viewModel.selectItemForDetails(item) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchResultsView(
+    query: String,
+    results: List<FileItem>,
+    onFileClick: (FileItem) -> Unit,
+    onOpenParentFolder: (FileItem) -> Unit,
+    onOpenInNewTab: (FileItem) -> Unit,
+    onCopyToOtherPane: (FileItem) -> Unit,
+    onClearSearch: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Results (${results.size})",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            TextButton(onClick = onClearSearch) {
+                Text("Exit Search", style = MaterialTheme.typography.labelMedium)
+            }
+        }
+
+        if (results.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No files found matching criteria",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize().testTag("files_search_results_view")
+            ) {
+                items(results, key = { it.path }) { item ->
+                    SearchResultRow(
+                        item = item,
+                        onClick = { onFileClick(item) },
+                        onOpenParentFolder = { onOpenParentFolder(item) },
+                        onOpenInNewTab = { onOpenInNewTab(item) },
+                        onCopyToOtherPane = { onCopyToOtherPane(item) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchResultRow(
+    item: FileItem,
+    onClick: () -> Unit,
+    onOpenParentFolder: () -> Unit,
+    onOpenInNewTab: () -> Unit,
+    onCopyToOtherPane: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onClick() }
+            .testTag("search_result_item_${item.name}"),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (item.isDirectory) Icons.Default.Folder else Icons.Default.Folder,
+                contentDescription = null,
+                tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = item.path,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Options")
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.search_open_parent)) },
+                        onClick = {
+                            showMenu = false
+                            onOpenParentFolder()
+                        },
+                        leadingIcon = { Icon(Icons.Default.Folder, contentDescription = null) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.search_open_new_tab)) },
+                        onClick = {
+                            showMenu = false
+                            onOpenInNewTab()
+                        },
+                        leadingIcon = { Icon(Icons.Default.OpenInNew, contentDescription = null) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.dual_pane_copy_to_other)) },
+                        onClick = {
+                            showMenu = false
+                            onCopyToOtherPane()
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -454,94 +702,58 @@ private fun FileListRow(
     onDeleteClick: () -> Unit,
     onDetailsClick: () -> Unit
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
-    val formattedDate = remember(item.lastModified) {
-        if (item.lastModified > 0) {
-            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(item.lastModified))
-        } else ""
-    }
+    var expandedMenu by remember { mutableStateOf(false) }
 
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
+            .clickable { onClick() }
             .testTag("file_item_${item.name}"),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        if (item.isDirectory) {
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = getFileIcon(item),
-                    contentDescription = null,
-                    tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            Icon(
+                imageVector = if (item.isDirectory) Icons.Default.Folder else Icons.Default.Folder,
+                contentDescription = null,
+                tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(32.dp)
+            )
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                val subtitle = if (item.isDirectory) {
-                    formattedDate
-                } else {
-                    "${ByteFormatter.format(item.size)} • $formattedDate"
-                }
                 Text(
-                    text = subtitle,
+                    text = if (item.isDirectory) "Folder" else item.formattedSize,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Box {
-                IconButton(
-                    onClick = { menuExpanded = true },
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Options",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
+                IconButton(onClick = { expandedMenu = true }) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Options")
                 }
-
                 DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
+                    expanded = expandedMenu,
+                    onDismissRequest = { expandedMenu = false }
                 ) {
                     DropdownMenuItem(
                         text = { Text("Details") },
                         onClick = {
-                            menuExpanded = false
+                            expandedMenu = false
                             onDetailsClick()
                         },
                         leadingIcon = { Icon(Icons.Default.Info, contentDescription = null) }
@@ -549,15 +761,15 @@ private fun FileListRow(
                     DropdownMenuItem(
                         text = { Text("Rename") },
                         onClick = {
-                            menuExpanded = false
+                            expandedMenu = false
                             onRenameClick()
                         },
                         leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null) }
                     )
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
                         onClick = {
-                            menuExpanded = false
+                            expandedMenu = false
                             onDeleteClick()
                         },
                         leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) }
@@ -576,55 +788,37 @@ private fun FileGridCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(onClick = onClick)
-            .testTag("file_grid_${item.name}"),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        if (item.isDirectory) {
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = getFileIcon(item),
-                    contentDescription = null,
-                    tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+            Icon(
+                imageVector = if (item.isDirectory) Icons.Default.Folder else Icons.Default.Folder,
+                contentDescription = null,
+                tint = if (item.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(48.dp)
+            )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = item.name,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
-
             Text(
-                text = if (item.isDirectory) "Folder" else ByteFormatter.format(item.size),
+                text = if (item.isDirectory) "Folder" else item.formattedSize,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -640,28 +834,24 @@ private fun InputDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var textValue by remember { mutableStateOf(initialValue) }
+    var text by remember { mutableStateOf(initialValue) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             OutlinedTextField(
-                value = textValue,
-                onValueChange = { textValue = it },
+                value = text,
+                onValueChange = { text = it },
                 label = { Text(label) },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag("dialog_input_field")
             )
         },
         confirmButton = {
             Button(
-                onClick = {
-                    if (textValue.isNotBlank()) {
-                        onConfirm(textValue)
-                    }
-                },
-                enabled = textValue.isNotBlank()
+                onClick = { if (text.isNotBlank()) onConfirm(text) },
+                enabled = text.isNotBlank()
             ) {
                 Text("Confirm")
             }
@@ -679,64 +869,25 @@ private fun FileDetailsDialog(
     item: FileItem,
     onDismiss: () -> Unit
 ) {
-    val formattedDate = remember(item.lastModified) {
-        if (item.lastModified > 0) {
-            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(item.lastModified))
-        } else "Unknown"
-    }
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("File Properties") },
+        title = { Text(if (item.isDirectory) "Folder Details" else "File Details") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DetailRow("Name", item.name)
-                DetailRow("Type", item.fileType.name)
-                if (!item.isDirectory) {
-                    DetailRow("Size", "${ByteFormatter.format(item.size)} (${item.size} bytes)")
-                }
-                DetailRow("Path", item.path)
-                DetailRow("Modified", formattedDate)
-                DetailRow("Readable", if (item.canRead) "Yes" else "No")
-                DetailRow("Writable", if (item.canWrite) "Yes" else "No")
+                Text("Name: ${item.name}", fontWeight = FontWeight.Bold)
+                Text("Path: ${item.path}")
+                Text("Size: ${item.formattedSize} (${item.size} bytes)")
+                Text("Modified: ${dateFormat.format(Date(item.lastModified))}")
+                Text("Type: ${item.fileType.name}")
+                Text("Writable: ${if (item.canWrite) "Yes" else "No"}")
             }
         },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text("OK")
+                Text("Close")
             }
         }
     )
-}
-
-@Composable
-private fun DetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "$label:",
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-private fun getFileIcon(item: FileItem): ImageVector {
-    if (item.isDirectory) return Icons.Default.Folder
-    return when (item.fileType) {
-        FileType.IMAGE -> Icons.Default.Image
-        FileType.VIDEO -> Icons.Default.VideoFile
-        FileType.AUDIO -> Icons.Default.MusicNote
-        FileType.DOCUMENT -> Icons.Default.Description
-        else -> Icons.Default.Description
-    }
 }

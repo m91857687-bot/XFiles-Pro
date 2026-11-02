@@ -111,5 +111,45 @@
     <string name="settings_app_name">XFiles Pro Android File Manager</string>
     <string name="settings_app_version">Version 1.0.0-alpha.4</string>
     <string name="settings_app_architecture">Architecture: Clean Architecture + M3</string>
-    <string name="settings_active_phase">Phase 4: Main UI Shell &amp; Navigation Active</string>
+    <string name="settings_active_phase">Phase 6: Advanced Search, Multi-Tabs &amp; Dual Pane Active</string>
+
+    <!-- Phase 6 Multi-Tabs Strings -->
+    <string name="tab_new">New Tab</string>
+    <string name="tab_close">Close Tab</string>
+    <string name="tab_close_others">Close Other Tabs</string>
+
+    <!-- Phase 6 Advanced Search Strings -->
+    <string name="filter_title">Search Filters</string>
+    <string name="filter_category">Category</string>
+    <string name="filter_size">Size Range</string>
+    <string name="filter_date">Date Modified</string>
+    <string name="filter_target">Item Type</string>
+    <string name="filter_target_both">Files &amp; Folders</string>
+    <string name="filter_target_files">Files Only</string>
+    <string name="filter_target_folders">Folders Only</string>
+    <string name="filter_clear_all">Reset Filters</string>
+    <string name="filter_apply">Apply Filters</string>
+    <string name="search_recent_title">Recent Searches</string>
+    <string name="search_clear_history">Clear History</string>
+    <string name="search_open_parent">Open Enclosing Folder</string>
+    <string name="search_open_new_tab">Open in New Tab</string>
+    <string name="search_scope_current">Current Folder Only</string>
+    <string name="search_scope_all">All Storage</string>
+    <string name="size_any">Any Size</string>
+    <string name="size_tiny">&lt; 1 MB</string>
+    <string name="size_medium">1 - 50 MB</string>
+    <string name="size_large">50 - 500 MB</string>
+    <string name="size_huge">&gt; 500 MB</string>
+    <string name="date_any">Any Date</string>
+    <string name="date_today">Last 24 Hours</string>
+    <string name="date_week">Last 7 Days</string>
+    <string name="date_month">Last 30 Days</string>
+    <string name="date_year">This Year</string>
+
+    <!-- Phase 6 Dual Pane Strings -->
+    <string name="dual_pane_toggle">Dual Pane</string>
+    <string name="dual_pane_primary">Primary Pane</string>
+    <string name="dual_pane_secondary">Secondary Pane</string>
+    <string name="dual_pane_copy_to_other">Copy to Other Pane</string>
+    <string name="dual_pane_move_to_other">Move to Other Pane</string>
 </resources>

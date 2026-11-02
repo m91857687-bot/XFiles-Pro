@@ -111,5 +111,45 @@
     <string name="settings_app_name">XFiles Pro مدير الملفات الاحترافي</string>
     <string name="settings_app_version">الإصدار 1.0.0-alpha.4</string>
     <string name="settings_app_architecture">المعمارية: Clean Architecture + M3</string>
-    <string name="settings_active_phase">المرحلة الرابعة: الواجهة الرئيسية وهيكل التنقل مفعّلة</string>
+    <string name="settings_active_phase">المرحلة السادسة: البحث المتقدم، التبويبات المتعددة واللوح المزدوج مفعّلة</string>
+
+    <!-- Phase 6 Multi-Tabs Strings -->
+    <string name="tab_new">تبويب جديد</string>
+    <string name="tab_close">إغلاق التبويب</string>
+    <string name="tab_close_others">إغلاق التبويبات الأخرى</string>
+
+    <!-- Phase 6 Advanced Search Strings -->
+    <string name="filter_title">فلاتر البحث</string>
+    <string name="filter_category">التصنيف</string>
+    <string name="filter_size">نطاق الحجم</string>
+    <string name="filter_date">تاريخ التعديل</string>
+    <string name="filter_target">نوع العنصر</string>
+    <string name="filter_target_both">ملفات ومجلدات</string>
+    <string name="filter_target_files">ملفات فقط</string>
+    <string name="filter_target_folders">مجلدات فقط</string>
+    <string name="filter_clear_all">إعادة ضبط الفلاتر</string>
+    <string name="filter_apply">تطبيق الفلاتر</string>
+    <string name="search_recent_title">عمليات البحث الأخيرة</string>
+    <string name="search_clear_history">مسح السجل</string>
+    <string name="search_open_parent">فتح المجلد الحاوي</string>
+    <string name="search_open_new_tab">فتح في تبويب جديد</string>
+    <string name="search_scope_current">المجلد الحالي فقط</string>
+    <string name="search_scope_all">كامل التخزين</string>
+    <string name="size_any">أي حجم</string>
+    <string name="size_tiny">&lt; 1 ميغابايت</string>
+    <string name="size_medium">1 - 50 ميغابايت</string>
+    <string name="size_large">50 - 500 ميغابايت</string>
+    <string name="size_huge">&gt; 500 ميغابايت</string>
+    <string name="date_any">أي وقت</string>
+    <string name="date_today">آخر 24 ساعة</string>
+    <string name="date_week">آخر 7 أيام</string>
+    <string name="date_month">آخر 30 يوماً</string>
+    <string name="date_year">هذا العام</string>
+
+    <!-- Phase 6 Dual Pane Strings -->
+    <string name="dual_pane_toggle">اللوح المزدوج</string>
+    <string name="dual_pane_primary">اللوح الرئيسي</string>
+    <string name="dual_pane_secondary">اللوح الثانوي</string>
+    <string name="dual_pane_copy_to_other">نسخ إلى اللوح الآخر</string>
+    <string name="dual_pane_move_to_other">نقل إلى اللوح الآخر</string>
 </resources>

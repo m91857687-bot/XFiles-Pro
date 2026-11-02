@@ -117,6 +117,51 @@ interface IndexedFileDao {
     fun searchByNameLike(query: String): Flow<List<IndexedFileEntity>>
 
     /**
+     * Advanced FTS search with multi-criteria filters (category, extension, size, date).
+     */
+    @Query("""
+        SELECT f.* FROM indexed_files f
+        JOIN indexed_files_fts fts ON f.id = fts.rowid
+        WHERE indexed_files_fts MATCH :matchQuery
+          AND (:category IS NULL OR f.category = :category)
+          AND (:extension IS NULL OR f.extension = :extension)
+          AND f.size >= :minSize AND f.size <= :maxSize
+          AND f.last_modified >= :minLastModified
+        ORDER BY f.is_directory DESC, f.name ASC
+        LIMIT 200
+    """)
+    fun searchAdvancedFts(
+        matchQuery: String,
+        category: String?,
+        extension: String?,
+        minSize: Long,
+        maxSize: Long,
+        minLastModified: Long
+    ): Flow<List<IndexedFileEntity>>
+
+    /**
+     * Advanced LIKE search with multi-criteria filters (category, extension, size, date).
+     */
+    @Query("""
+        SELECT * FROM indexed_files
+        WHERE (:query = '' OR name LIKE '%' || :query || '%' OR extension LIKE '%' || :query || '%')
+          AND (:category IS NULL OR category = :category)
+          AND (:extension IS NULL OR extension = :extension)
+          AND size >= :minSize AND size <= :maxSize
+          AND last_modified >= :minLastModified
+        ORDER BY is_directory DESC, name ASC
+        LIMIT 200
+    """)
+    fun searchAdvancedLike(
+        query: String,
+        category: String?,
+        extension: String?,
+        minSize: Long,
+        maxSize: Long,
+        minLastModified: Long
+    ): Flow<List<IndexedFileEntity>>
+
+    /**
      * Atomic batch update for incremental synchronization:
      * - Deletes removed files
      * - Inserts new or modified files

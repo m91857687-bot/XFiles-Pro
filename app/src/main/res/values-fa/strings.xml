@@ -111,5 +111,45 @@
     <string name="settings_app_name">مدیر فایل حرفه‌ای XFiles Pro</string>
     <string name="settings_app_version">نسخه 1.0.0-alpha.4</string>
     <string name="settings_app_architecture">معماری: Clean Architecture + M3</string>
-    <string name="settings_active_phase">مرحله ۴: پوسته اصلی و ناوبری فعال است</string>
+    <string name="settings_active_phase">مرحله ۶: جستجوی پیشرفته، چند تب و پنل دوگانه فعال است</string>
+
+    <!-- Phase 6 Multi-Tabs Strings -->
+    <string name="tab_new">تب جدید</string>
+    <string name="tab_close">بستن تب</string>
+    <string name="tab_close_others">بستن سایر تب‌ها</string>
+
+    <!-- Phase 6 Advanced Search Strings -->
+    <string name="filter_title">فیلترهای جستجو</string>
+    <string name="filter_category">دسته‌بندی</string>
+    <string name="filter_size">محدوده حجم</string>
+    <string name="filter_date">تاریخ تغییر</string>
+    <string name="filter_target">نوع مورد</string>
+    <string name="filter_target_both">فایل‌ها و پوشه‌ها</string>
+    <string name="filter_target_files">فقط فایل‌ها</string>
+    <string name="filter_target_folders">فقط پوشه‌ها</string>
+    <string name="filter_clear_all">بازنشانی فیلترها</string>
+    <string name="filter_apply">اعمال فیلترها</string>
+    <string name="search_recent_title">جستجوهای اخیر</string>
+    <string name="search_clear_history">پاک کردن تاریخچه</string>
+    <string name="search_open_parent">باز کردن پوشه حاوی</string>
+    <string name="search_open_new_tab">باز کردن در تب جدید</string>
+    <string name="search_scope_current">فقط پوشه فعلی</string>
+    <string name="search_scope_all">تمام حافظه</string>
+    <string name="size_any">هر اندازه</string>
+    <string name="size_tiny">&lt; ۱ مگابایت</string>
+    <string name="size_medium">۱ - ۵۰ مگابایت</string>
+    <string name="size_large">۵۰ - ۵۰۰ مگابایت</string>
+    <string name="size_huge">&gt; ۵۰۰ مگابایت</string>
+    <string name="date_any">هر زمان</string>
+    <string name="date_today">۲۴ ساعت گذشته</string>
+    <string name="date_week">۷ روز گذشته</string>
+    <string name="date_month">۳۰ روز گذشته</string>
+    <string name="date_year">امسال</string>
+
+    <!-- Phase 6 Dual Pane Strings -->
+    <string name="dual_pane_toggle">پنل دوگانه</string>
+    <string name="dual_pane_primary">پنل اصلی</string>
+    <string name="dual_pane_secondary">پنل دوم</string>
+    <string name="dual_pane_copy_to_other">کپی به پنل دیگر</string>
+    <string name="dual_pane_move_to_other">انتقال به پنل دیگر</string>
 </resources>
