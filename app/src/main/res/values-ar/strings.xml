@@ -33,4 +33,83 @@
     <string name="label_first_run_status">حالة الإعداد لأول مرة</string>
     <string name="status_completed">مكتمل</string>
     <string name="status_pending">معلق</string>
+
+    <!-- Phase 3 Theming System Strings -->
+    <string name="dialog_theme_title">سمة التطبيق</string>
+    <string name="dialog_theme_subtitle">اختر المظهر البصري المناسب لك</string>
+    <string name="btn_change_theme">تغيير السمة</string>
+    <string name="label_current_theme">السمة الحالية</string>
+    <string name="theme_classic">كلاسيكي (Classic)</string>
+    <string name="theme_classic_desc">واجهة أبيض وأسود ناصعة عالية التباين</string>
+    <string name="theme_midnight">منتصف الليل (Midnight)</string>
+    <string name="theme_midnight_desc">أسود فاحم لشاشات AMOLED ومريح للعين</string>
+    <string name="theme_royal">ملكي (Royal)</string>
+    <string name="theme_royal_desc">أسود فاخر مع لمسات ذهبية أنيقة</string>
+    <string name="theme_system">النظام (System)</string>
+    <string name="theme_system_desc">تتبع مظهر نظام أندرويد تلقائياً</string>
+
+    <!-- Phase 4 Navigation & UI Shell Strings -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_files">الملفات</string>
+    <string name="nav_media">الوسائط</string>
+    <string name="nav_tools">الأدوات</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Top App Bar -->
+    <string name="action_search">بحث</string>
+    <string name="action_view_mode">تغيير نمط العرض</string>
+    <string name="action_more_options">خيارات إضافية</string>
+
+    <!-- Quick Access Panel -->
+    <string name="section_quick_access">الوصول السريع</string>
+    <string name="qa_internal_storage">الذاكرة الداخلية</string>
+    <string name="qa_sd_card">بطاقة SD</string>
+    <string name="qa_photos">الصور</string>
+    <string name="qa_videos">الفيديوهات</string>
+    <string name="qa_audio">الصوتيات</string>
+    <string name="qa_documents">المستندات</string>
+    <string name="qa_downloads">التنزيلات</string>
+    <string name="qa_apps">التطبيقات</string>
+
+    <!-- Storage Overview -->
+    <string name="storage_overview_title">مساحة التخزين</string>
+    <string name="storage_used_format">مستخدم %1$s من %2$s</string>
+    <string name="storage_free_format">متبقي %1$s فارغة</string>
+    <string name="storage_status_healthy">أداء النظام ممتاز</string>
+
+    <!-- Files Section -->
+    <string name="section_recent_files">معاينة الملفات الأخيرة</string>
+    <string name="files_breadcrumb_root">التخزين</string>
+    <string name="files_view_list">قائمة</string>
+    <string name="files_view_grid">شبكة</string>
+    <string name="preview_mode_notice">معاينة واجهة العرض (هيكل المرحلة 4)</string>
+
+    <!-- Media Section -->
+    <string name="media_tab_photos">الصور</string>
+    <string name="media_tab_videos">الفيديوهات</string>
+    <string name="media_tab_audio">الصوتيات</string>
+
+    <!-- Tools Section -->
+    <string name="tools_title">حزمة الأدوات</string>
+    <string name="tools_subtitle">أدوات الفحص والإدارة المتقدمة للملفات</string>
+    <string name="tool_storage_analyzer">تحليل التخزين</string>
+    <string name="tool_storage_analyzer_desc">مخطط بياني لتوزيع استهلاك الذاكرة والملفات الضخمة</string>
+    <string name="tool_duplicate_cleaner">منظف الملفات المكررة</string>
+    <string name="tool_duplicate_cleaner_desc">اكتشاف الملفات المتطابقة عبر بصمة الهاش الرقمية</string>
+    <string name="tool_recycle_bin">سلة المحذوفات</string>
+    <string name="tool_recycle_bin_desc">استعادة الملفات المحذوفة بأمان إلى مساراتها السابقة</string>
+    <string name="tool_wifi_sharing">المشاركة عبر Wi-Fi</string>
+    <string name="tool_wifi_sharing_desc">خادم محلي عالي السرعة لنقل الملفات عبر المتصفح</string>
+    <string name="tool_vault">الخزنة المشفرة</string>
+    <string name="tool_vault_desc">تشفير قوي بـ AES-256 وحماية بالبصمة والعتاد الآمن</string>
+    <string name="tool_coming_soon">مجدولة للمراحل القادمة</string>
+
+    <!-- Settings Section -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_section_preferences">التفضيلات</string>
+    <string name="settings_section_about">حول XFiles Pro</string>
+    <string name="settings_app_name">XFiles Pro مدير الملفات الاحترافي</string>
+    <string name="settings_app_version">الإصدار 1.0.0-alpha.4</string>
+    <string name="settings_app_architecture">المعمارية: Clean Architecture + M3</string>
+    <string name="settings_active_phase">المرحلة الرابعة: الواجهة الرئيسية وهيكل التنقل مفعّلة</string>
 </resources>

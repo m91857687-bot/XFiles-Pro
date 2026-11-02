@@ -33,4 +33,83 @@
     <string name="label_first_run_status">First Run Status</string>
     <string name="status_completed">Completed</string>
     <string name="status_pending">Pending</string>
+
+    <!-- Phase 3 Theming System Strings -->
+    <string name="dialog_theme_title">App Theme</string>
+    <string name="dialog_theme_subtitle">Choose your visual appearance</string>
+    <string name="btn_change_theme">Change Theme</string>
+    <string name="label_current_theme">Current Theme</string>
+    <string name="theme_classic">Classic</string>
+    <string name="theme_classic_desc">Clean high-contrast black &amp; white</string>
+    <string name="theme_midnight">Midnight</string>
+    <string name="theme_midnight_desc">OLED deep dark with luminescent accents</string>
+    <string name="theme_royal">Royal</string>
+    <string name="theme_royal_desc">Obsidian black with imperial gold accents</string>
+    <string name="theme_system">System</string>
+    <string name="theme_system_desc">Follows Android device dark mode</string>
+
+    <!-- Phase 4 Navigation & UI Shell Strings -->
+    <string name="nav_home">Home</string>
+    <string name="nav_files">Files</string>
+    <string name="nav_media">Media</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Top App Bar -->
+    <string name="action_search">Search</string>
+    <string name="action_view_mode">Change view mode</string>
+    <string name="action_more_options">More options</string>
+
+    <!-- Quick Access Panel -->
+    <string name="section_quick_access">Quick Access</string>
+    <string name="qa_internal_storage">Internal Storage</string>
+    <string name="qa_sd_card">SD Card</string>
+    <string name="qa_photos">Photos</string>
+    <string name="qa_videos">Videos</string>
+    <string name="qa_audio">Audio</string>
+    <string name="qa_documents">Documents</string>
+    <string name="qa_downloads">Downloads</string>
+    <string name="qa_apps">Apps</string>
+
+    <!-- Storage Overview -->
+    <string name="storage_overview_title">Device Storage</string>
+    <string name="storage_used_format">%1$s used of %2$s</string>
+    <string name="storage_free_format">%1$s free</string>
+    <string name="storage_status_healthy">Optimal Performance</string>
+
+    <!-- Files Section -->
+    <string name="section_recent_files">Recent Files Preview</string>
+    <string name="files_breadcrumb_root">Storage</string>
+    <string name="files_view_list">List</string>
+    <string name="files_view_grid">Grid</string>
+    <string name="preview_mode_notice">UI Layout Preview (Phase 4 Shell)</string>
+
+    <!-- Media Section -->
+    <string name="media_tab_photos">Photos</string>
+    <string name="media_tab_videos">Videos</string>
+    <string name="media_tab_audio">Audio</string>
+
+    <!-- Tools Section -->
+    <string name="tools_title">Utility Suite</string>
+    <string name="tools_subtitle">Advanced diagnostic and management tools</string>
+    <string name="tool_storage_analyzer">Storage Analyzer</string>
+    <string name="tool_storage_analyzer_desc">Visual breakdown of storage usage and large items</string>
+    <string name="tool_duplicate_cleaner">Duplicate Cleaner</string>
+    <string name="tool_duplicate_cleaner_desc">Hash-based exact match duplicate file detector</string>
+    <string name="tool_recycle_bin">Recycle Bin</string>
+    <string name="tool_recycle_bin_desc">Safely recover deleted files to original paths</string>
+    <string name="tool_wifi_sharing">Wi-Fi Sharing</string>
+    <string name="tool_wifi_sharing_desc">High-speed local network web transfer server</string>
+    <string name="tool_vault">Secure Vault</string>
+    <string name="tool_vault_desc">Hardware-backed AES-256 encrypted file protection</string>
+    <string name="tool_coming_soon">Planned in next phase</string>
+
+    <!-- Settings Section -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_section_about">About XFiles Pro</string>
+    <string name="settings_app_name">XFiles Pro Android File Manager</string>
+    <string name="settings_app_version">Version 1.0.0-alpha.4</string>
+    <string name="settings_app_architecture">Architecture: Clean Architecture + M3</string>
+    <string name="settings_active_phase">Phase 4: Main UI Shell &amp; Navigation Active</string>
 </resources>

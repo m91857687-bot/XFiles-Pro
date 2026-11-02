@@ -33,4 +33,83 @@
     <string name="label_first_run_status">Estado de primera ejecución</string>
     <string name="status_completed">Completado</string>
     <string name="status_pending">Pendiente</string>
+
+    <!-- Phase 3 Theming System Strings -->
+    <string name="dialog_theme_title">Tema de la aplicación</string>
+    <string name="dialog_theme_subtitle">Elija su apariencia visual</string>
+    <string name="btn_change_theme">Cambiar tema</string>
+    <string name="label_current_theme">Tema actual</string>
+    <string name="theme_classic">Clásico</string>
+    <string name="theme_classic_desc">Blanco y negro limpio de alto contraste</string>
+    <string name="theme_midnight">Medianoche</string>
+    <string name="theme_midnight_desc">Oscuro profundo OLED con detalles luminosos</string>
+    <string name="theme_royal">Real</string>
+    <string name="theme_royal_desc">Negro obsidiana con elegantes toques dorados</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_system_desc">Sigue el modo oscuro del dispositivo Android</string>
+
+    <!-- Phase 4 Navigation & UI Shell Strings -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_files">Archivos</string>
+    <string name="nav_media">Medios</string>
+    <string name="nav_tools">Herramientas</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Top App Bar -->
+    <string name="action_search">Buscar</string>
+    <string name="action_view_mode">Cambiar modo de vista</string>
+    <string name="action_more_options">Más opciones</string>
+
+    <!-- Quick Access Panel -->
+    <string name="section_quick_access">Acceso rápido</string>
+    <string name="qa_internal_storage">Almacenamiento interno</string>
+    <string name="qa_sd_card">Tarjeta SD</string>
+    <string name="qa_photos">Fotos</string>
+    <string name="qa_videos">Videos</string>
+    <string name="qa_audio">Audio</string>
+    <string name="qa_documents">Documentos</string>
+    <string name="qa_downloads">Descargas</string>
+    <string name="qa_apps">Aplicaciones</string>
+
+    <!-- Storage Overview -->
+    <string name="storage_overview_title">Almacenamiento del dispositivo</string>
+    <string name="storage_used_format">%1$s usado de %2$s</string>
+    <string name="storage_free_format">%1$s libre</string>
+    <string name="storage_status_healthy">Rendimiento óptimo</string>
+
+    <!-- Files Section -->
+    <string name="section_recent_files">Vista previa de archivos recientes</string>
+    <string name="files_breadcrumb_root">Almacenamiento</string>
+    <string name="files_view_list">Lista</string>
+    <string name="files_view_grid">Cuadrícula</string>
+    <string name="preview_mode_notice">Vista previa de diseño (Estructura Fase 4)</string>
+
+    <!-- Media Section -->
+    <string name="media_tab_photos">Fotos</string>
+    <string name="media_tab_videos">Videos</string>
+    <string name="media_tab_audio">Audio</string>
+
+    <!-- Tools Section -->
+    <string name="tools_title">Herramientas</string>
+    <string name="tools_subtitle">Herramientas avanzadas de gestión y diagnóstico</string>
+    <string name="tool_storage_analyzer">Analizador de almacenamiento</string>
+    <string name="tool_storage_analyzer_desc">Desglose visual del uso de espacio y archivos grandes</string>
+    <string name="tool_duplicate_cleaner">Limpiador de duplicados</string>
+    <string name="tool_duplicate_cleaner_desc">Detector de archivos idénticos mediante hash digital</string>
+    <string name="tool_recycle_bin">Papelera de reciclaje</string>
+    <string name="tool_recycle_bin_desc">Recupere archivos eliminados a sus rutas originales</string>
+    <string name="tool_wifi_sharing">Compartir por Wi-Fi</string>
+    <string name="tool_wifi_sharing_desc">Servidor web de transferencia local de alta velocidad</string>
+    <string name="tool_vault">Bóveda segura</string>
+    <string name="tool_vault_desc">Protección cifrada AES-256 respaldada por hardware</string>
+    <string name="tool_coming_soon">Planificado para la próxima fase</string>
+
+    <!-- Settings Section -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_section_preferences">Preferencias</string>
+    <string name="settings_section_about">Acerca de XFiles Pro</string>
+    <string name="settings_app_name">XFiles Pro Administrador de archivos</string>
+    <string name="settings_app_version">Versión 1.0.0-alpha.4</string>
+    <string name="settings_app_architecture">Arquitectura: Clean Architecture + M3</string>
+    <string name="settings_active_phase">Fase 4: Estructura de interfaz y navegación activa</string>
 </resources>

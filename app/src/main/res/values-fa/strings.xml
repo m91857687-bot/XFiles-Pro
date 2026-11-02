@@ -33,4 +33,83 @@
     <string name="label_first_run_status">وضعیت اجرای اول</string>
     <string name="status_completed">تکمیل شده</string>
     <string name="status_pending">در انتظار</string>
+
+    <!-- Phase 3 Theming System Strings -->
+    <string name="dialog_theme_title">تم برنامه</string>
+    <string name="dialog_theme_subtitle">ظاهر بصری مورد نظر خود را انتخاب کنید</string>
+    <string name="btn_change_theme">تغییر تم</string>
+    <string name="label_current_theme">تم فعلی</string>
+    <string name="theme_classic">کلاسیک</string>
+    <string name="theme_classic_desc">سیاه و سفید شفاف با کنتراست بالا</string>
+    <string name="theme_midnight">نیمه‌شب</string>
+    <string name="theme_midnight_desc">مشکی عمیق مناسب OLED با المان‌های ملایم</string>
+    <string name="theme_royal">شاهانه</string>
+    <string name="theme_royal_desc">مشکی مجلل با جلوه‌های طلایی چشم‌نواز</string>
+    <string name="theme_system">سیستم</string>
+    <string name="theme_system_desc">پیروی خودکار از تم سیستم اندروید</string>
+
+    <!-- Phase 4 Navigation & UI Shell Strings -->
+    <string name="nav_home">خانه</string>
+    <string name="nav_files">فایل‌ها</string>
+    <string name="nav_media">رسانه</string>
+    <string name="nav_tools">ابزارها</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <!-- Top App Bar -->
+    <string name="action_search">جستجو</string>
+    <string name="action_view_mode">تغییر حالت نمایش</string>
+    <string name="action_more_options">گزینه‌های بیشتر</string>
+
+    <!-- Quick Access Panel -->
+    <string name="section_quick_access">دسترسی سریع</string>
+    <string name="qa_internal_storage">حافظه داخلی</string>
+    <string name="qa_sd_card">کارت حافظه</string>
+    <string name="qa_photos">عکس‌ها</string>
+    <string name="qa_videos">ویدیوها</string>
+    <string name="qa_audio">صداها</string>
+    <string name="qa_documents">اسناد</string>
+    <string name="qa_downloads">دانلودها</string>
+    <string name="qa_apps">برنامه‌ها</string>
+
+    <!-- Storage Overview -->
+    <string name="storage_overview_title">فضای ذخیره‌سازی</string>
+    <string name="storage_used_format">%1$s استفاده شده از %2$s</string>
+    <string name="storage_free_format">%1$s فضای آزاد</string>
+    <string name="storage_status_healthy">عملکرد بهینه</string>
+
+    <!-- Files Section -->
+    <string name="section_recent_files">پیش‌نمایش فایل‌های اخیر</string>
+    <string name="files_breadcrumb_root">حافظه</string>
+    <string name="files_view_list">فهرست</string>
+    <string name="files_view_grid">شبکه‌ای</string>
+    <string name="preview_mode_notice">پیش‌نمایش ساختار رابط (مرحله ۴)</string>
+
+    <!-- Media Section -->
+    <string name="media_tab_photos">عکس‌ها</string>
+    <string name="media_tab_videos">ویدیوها</string>
+    <string name="media_tab_audio">صداها</string>
+
+    <!-- Tools Section -->
+    <string name="tools_title">مجموعه ابزارها</string>
+    <string name="tools_subtitle">ابزارهای پیشرفته مدیریت و بررسی فایل‌ها</string>
+    <string name="tool_storage_analyzer">تحلیلگر حافظه</string>
+    <string name="tool_storage_analyzer_desc">نمودار توزیع مصرف فضا و فایل‌های حجیم</string>
+    <string name="tool_duplicate_cleaner">پاک‌کننده فایل‌های تکراری</string>
+    <string name="tool_duplicate_cleaner_desc">شناسایی فایل‌های تکراری با هش دیجیتال دقیق</string>
+    <string name="tool_recycle_bin">سطل زباله</string>
+    <string name="tool_recycle_bin_desc">بازیابی ایمن فایل‌های حذف شده به مسیر قبلی</string>
+    <string name="tool_wifi_sharing">اشتراک‌گذاری با Wi-Fi</string>
+    <string name="tool_wifi_sharing_desc">سرور وب پرسرعت برای انتقال محلی فایل‌ها</string>
+    <string name="tool_vault">گاوصندوق امن</string>
+    <string name="tool_vault_desc">حفاظت از فایل‌ها با رمزنگاری سخت‌افزاری AES-256</string>
+    <string name="tool_coming_soon">برنامه‌ریزی شده برای مراحل آینده</string>
+
+    <!-- Settings Section -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_section_preferences">ترجیحات</string>
+    <string name="settings_section_about">درباره XFiles Pro</string>
+    <string name="settings_app_name">مدیر فایل حرفه‌ای XFiles Pro</string>
+    <string name="settings_app_version">نسخه 1.0.0-alpha.4</string>
+    <string name="settings_app_architecture">معماری: Clean Architecture + M3</string>
+    <string name="settings_active_phase">مرحله ۴: پوسته اصلی و ناوبری فعال است</string>
 </resources>

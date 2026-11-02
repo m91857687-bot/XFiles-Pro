@@ -47,3 +47,10 @@
 ### 6. التوافق المزدوج للغات بين Compose وإعدادات النظام (Per-App Language Preferences)
 - **الوصف:** بدءاً من Android 13 (API 33)، وفر النظام ميزة إعدادات اللغة لكل تطبيق عبر إعدادات النظام (`android.app.LocaleManager`). يعتمد حلنا الحالي على `LocalizedApp` في Compose عبر `createConfigurationContext` و `LocalLayoutDirection` لتفادي إعادة إنشاء النشاط (Activity Recreation) ومنع فقدان حالة المستخدم.
 - **الحل الهندسي:** الحل الحالي يعمل بنجاح 100% على كافة الإصدارات من API 24 وحتى API 36، وفي حال الرغبة بربط التفضيل أيضاً مع إعدادات نظام أندرويد 13 الخارجية دون إعادة تشغيل، يمكن استدعاء `LocaleManager.setApplicationLocales` بالتوازي بعد التحقق من إصدار النظام `Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU`.
+
+
+---
+
+### 7. منع تعدد نُسخ DataStore لنفس ملف التفضيلات (DataStore Singleton Invariant)
+- **الوصف:** تفرض مكتبة Jetpack DataStore قاعدة صارمة بأن يكون لكل ملف تفضيلات (`.preferences_pb`) كائن DataStore وحيد (Singleton) داخل العملية الواحدة، وأي محاولة لاستدعاء مفوض `preferencesDataStore` باسم الملف نفسه أكثر من مرة ستؤدي إلى استثناء فوري `IllegalStateException: There are multiple DataStores active for the same file`.
+- **الحل الهندسي المنفذ:** تم تعريف `Context.dataStore` مرة واحدة مركزياً، وتقوم كل من `LanguagePreferences` و `ThemePreferences` بإعادة استخدام نفس الكائن المشترك وتمريره في الحاوية المركزية `AppContainer` ومستودعات البيانات، مما يضمن التزامن التام والتماسك وانعدام أي تضارب في القراءة والكتابة.

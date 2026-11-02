@@ -10,6 +10,10 @@ import com.xfiles.pro.data.repository.StorageRepositoryImpl
 import com.xfiles.pro.domain.repository.LanguageRepository
 import com.xfiles.pro.domain.repository.StorageRepository
 
+import com.xfiles.pro.data.local.datastore.ThemePreferences
+import com.xfiles.pro.data.repository.ThemeRepositoryImpl
+import com.xfiles.pro.domain.repository.ThemeRepository
+
 /**
  * Dependency injection container for application-level singletons.
  */
@@ -19,6 +23,8 @@ interface AppContainer {
     val storageRepository: StorageRepository
     val languagePreferences: LanguagePreferences
     val languageRepository: LanguageRepository
+    val themePreferences: ThemePreferences
+    val themeRepository: ThemeRepository
 }
 
 /**
@@ -44,5 +50,13 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val languageRepository: LanguageRepository by lazy {
         LanguageRepositoryImpl(languagePreferences, dispatchersProvider)
+    }
+
+    override val themePreferences: ThemePreferences by lazy {
+        ThemePreferences(context)
+    }
+
+    override val themeRepository: ThemeRepository by lazy {
+        ThemeRepositoryImpl(themePreferences, dispatchersProvider)
     }
 }
