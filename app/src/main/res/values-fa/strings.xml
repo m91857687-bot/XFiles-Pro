@@ -1,0 +1,36 @@
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">XFiles Pro</string>
+
+    <!-- First Run Language Selection -->
+    <string name="language_select_title">انتخاب زبان برنامه</string>
+    <string name="language_select_subtitle">زبان مورد نظر خود را برای شروع استفاده از XFiles Pro انتخاب کنید</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
+    <string name="language_fa">فارسی</string>
+    <string name="language_ar_sub">عربی</string>
+    <string name="language_en_sub">انگلیسی</string>
+    <string name="language_es_sub">اسپانیایی</string>
+    <string name="language_fa_sub">فارسی</string>
+    <string name="btn_continue">ادامه</string>
+
+    <!-- Runtime Language Switcher Dialog -->
+    <string name="dialog_language_title">زبان برنامه</string>
+    <string name="dialog_language_subtitle">تغییر فوری زبان رابط کاربری بدون راه‌اندازی مجدد</string>
+    <string name="btn_cancel">لغو</string>
+    <string name="btn_apply">اعمال</string>
+    <string name="btn_change_language">تغییر زبان</string>
+
+    <!-- Home & Status Display -->
+    <string name="home_title">XFiles Pro</string>
+    <string name="home_status_ready">سیستم چندزبانه فعال است</string>
+    <string name="home_status_desc">تنظیمات زبان به طور ایمن در DataStore با تغییر پویا ذخیره می‌شوند.</string>
+    <string name="label_current_language">زبان فعلی</string>
+    <string name="label_layout_direction">جهت چیدمان</string>
+    <string name="direction_rtl">راست به چپ (RTL)</string>
+    <string name="direction_ltr">چپ به راست (LTR)</string>
+    <string name="label_first_run_status">وضعیت اجرای اول</string>
+    <string name="status_completed">تکمیل شده</string>
+    <string name="status_pending">در انتظار</string>
+</resources>

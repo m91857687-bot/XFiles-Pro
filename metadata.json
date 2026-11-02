@@ -1,0 +1,6 @@
+{
+  "name": "XFiles Pro",
+  "description": "Professional Android File Manager featuring persistent indexing, multi-tab browsing, secure vault, archive management, and storage analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

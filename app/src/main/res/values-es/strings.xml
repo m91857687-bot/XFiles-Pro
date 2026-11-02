@@ -1,0 +1,36 @@
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">XFiles Pro</string>
+
+    <!-- First Run Language Selection -->
+    <string name="language_select_title">Elegir idioma</string>
+    <string name="language_select_subtitle">Seleccione su idioma preferido para comenzar a usar XFiles Pro</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
+    <string name="language_fa">فارسی</string>
+    <string name="language_ar_sub">Árabe</string>
+    <string name="language_en_sub">Inglés</string>
+    <string name="language_es_sub">Español</string>
+    <string name="language_fa_sub">Persa</string>
+    <string name="btn_continue">Continuar</string>
+
+    <!-- Runtime Language Switcher Dialog -->
+    <string name="dialog_language_title">Idioma de la aplicación</string>
+    <string name="dialog_language_subtitle">Cambie el idioma de la interfaz al instante</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_apply">Aplicar</string>
+    <string name="btn_change_language">Cambiar idioma</string>
+
+    <!-- Home & Status Display -->
+    <string name="home_title">XFiles Pro</string>
+    <string name="home_status_ready">Sistema multilingüe activo</string>
+    <string name="home_status_desc">Las preferencias de idioma se guardan de forma segura en DataStore con cambio dinámico.</string>
+    <string name="label_current_language">Idioma actual</string>
+    <string name="label_layout_direction">Dirección de diseño</string>
+    <string name="direction_rtl">De derecha a izquierda (RTL)</string>
+    <string name="direction_ltr">De izquierda a derecha (LTR)</string>
+    <string name="label_first_run_status">Estado de primera ejecución</string>
+    <string name="status_completed">Completado</string>
+    <string name="status_pending">Pendiente</string>
+</resources>
