@@ -2,6 +2,40 @@
 
 جميع التعديلات والتحسينات البرمجية التي تطرأ على مشروع **XFiles Pro** يتم توثيقها زمنياً في هذا الملف وفق معايير [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.0-alpha.8] - 2026-11-03 (المجموعة الثانية - المرحلة 7: إدارة وضغط وفك واستعراض الأرشيفات)
+
+### تمت إضافته (Added)
+- **طبقة النماذج وعقود الأرشيفات (`domain/`):**
+  - `ArchiveFormat.kt`: دعم شامل لصيغ `ZIP`، `TAR`، `TAR_GZ`، `TGZ`، `GZIP`، `BZIP2`، `XZ`، `SEVEN_Z` (7z)، وصيغة `RAR` (استعراض وفك فقط عبر Junrar).
+  - `CompressionLevel.kt`: خمسة مستويات ضغط من التخزين السريع وحتى أقصى ضغط (`STORE`, `FAST`, `NORMAL`, `MAXIMUM`, `ULTRA`).
+  - `ArchiveEntryItem.kt`: تمثيل عناصر الأرشيف الافتراضية مع الأحجام المضغوطة والأصلية وتواريخ التعديل وكلمات المرور.
+  - `ArchiveProgress.kt`: تتبع تدفقي لنسبة التقدم، اسم الملف الحالي، إجمالي الملفات المعالجة، والبايتات المنقولة.
+  - `ArchiveSecurityPolicy.kt` و `ArchiveSecurityException.kt`: حماية صارمة ضد ثغرات **Zip Slip** (Path Traversal) وقنابل الأرشيف **Archive Bombs** (نسبة تفوق 100:1 وسقف 2GB).
+  - `ArchiveRepository.kt`: عقد إدارة وإنشاء وفك واستعراض الأرشيفات والتعديل الموضعي.
+- **محركات الأرشيفات المتخصصة والمستودع المركزي (`data/`):**
+  - `ZipArchiveHandler.kt`: إدارة ملفات ZIP بواسطة Zip4j مع تشفير AES-256 بكلمات مرور وتعديل موضعي للحذف والإضافة.
+  - `TarArchiveHandler.kt`: معالجة أرشيفات TAR، TAR.GZ، و TGZ بواسطة Apache Commons Compress.
+  - `SingleCompressorHandler.kt`: ضغط وفك ملفات GZIP، BZIP2، و XZ التدفقي المباشر.
+  - `SevenZArchiveHandler.kt`: إنشاء واستعراض واستخراج أرشيفات 7Z عبر `SevenZFile.builder()` مع ضغط LZMA2.
+  - `RarArchiveHandler.kt`: استعراض وفك أرشيفات RAR بواسطة Junrar مع بناء شجرة مجلدات افتراضية كاملة.
+  - `ArchiveRepositoryImpl.kt`: المستودع المركزي مع حل التعارضات (`AUTO_RENAME`, `OVERWRITE`, `SKIP`)، إلغاء فوري عبر Coroutines، وتدفق تقدم دقيق.
+- **واجهة المستخدم المدمجة (`ui/archive/`):**
+  - `ArchiveViewModel.kt` و `ArchiveUiState.kt`: إدارة استعراض محتويات الأرشيف، الهيكل الشجري الافتراضي، البحث داخل الأرشيف، والتحديد المتعدد.
+  - `ArchiveViewerScreen.kt`: شاشة مخصصة لاستعراض الأرشيفات مع شريط مسار (Breadcrumbs)، فرز، شريط بحث، وأزرار استخراج وحذف.
+  - حوارات متخصصة: `CreateArchiveDialog.kt`، `ExtractArchiveDialog.kt`، `PasswordPromptDialog.kt`، و `ArchiveProgressDialog.kt`.
+  - ربط كامل مع `FilesScreen.kt` لفتح الأرشيفات وضغط الملفات مباشرة.
+- **حزم الاختبارات (27 اختباراً جديداً — الإجمالي 163 اختباراً بنسبة نجاح 100%):**
+  - `ArchiveSecurityPolicyTest.kt` (5 اختبارات)، `ZipArchiveHandlerTest.kt` (4 اختبارات)، `TarArchiveHandlerTest.kt` (2 اختبارات)، `SingleCompressorHandlerTest.kt` (3 اختبارات)، `SevenZArchiveHandlerTest.kt` (1 اختبار)، `ArchiveRepositoryTest.kt` (7 اختبارات)، `ArchiveViewModelTest.kt` (6 اختبارات).
+
+## [0.1.0-alpha.7] - 2026-11-02 (المجموعة الثانية - المرحلة 6: البحث المتقدم والتبويبات واللوح المزدوج Dual Pane)
+
+### تمت إضافته (Added)
+- **البحث المتقدم وسجل البحث:** نماذج فلاتر البحث المركبة (`SearchFilterCriteria`، `SizeFilterRange`، `DateFilterRange`، `SearchTarget`)، استعلامات FTS و LIKE الهجينة، واستمرارية سجل آخر 15 عملية بحث في DataStore.
+- **التبويبات المتعددة الدائمة:** نموذج `FileTab`، حفظ واسترجاع التبويبات في DataStore، حماية التبويب الأخير، وشريط تبويبات متجاوب `FileTabBar`.
+- **اللوح المزدوج (Dual Pane):** لوحين تصفح مستقلين للأجهزة اللوحية (عرض >= 600dp) والهواتف، ونقل ونسخ الملفات بين الألواح مع حل التعارض التلقائي.
+- **حزم الاختبارات (28 اختباراً جديداً — الإجمالي 136 اختباراً بنسبة نجاح 100%):**
+  - `Phase6ModelsTest.kt`، `TabPreferencesTest.kt`، `SearchPreferencesTest.kt`، `AdvancedSearchFilterTest.kt`، `FilesViewModelPhase6Test.kt`.
+
 ## [0.1.0-alpha.6] - 2026-11-02 (المجموعة الثانية - المرحلة 5B: الفهرسة الدائمة للملفات عبر Room و FTS5)
 
 ### تمت إضافته (Added)

@@ -1,6 +1,6 @@
 # XFiles Pro — PROJECT STRUCTURE (بنية وهيكل مجلدات المشروع)
 
-يشرح هذا المستند التقسيم الهيكلي لحزم المشروع وملفات المصدر والموارد بعد اكتمال المراحل 1 و 2 و 3 و 4 و 5A.
+يشرح هذا المستند التقسيم الهيكلي لحزم المشروع وملفات المصدر والموارد بعد اكتمال المراحل 1 و 2 و 3 و 4 و 5A و 5B و 6 و 7.
 
 ---
 
@@ -29,7 +29,7 @@
 │       │       ├── values-ar/strings.xml  # المرجع العربي (ar)
 │       │       ├── values-es/strings.xml  # المرجع الإسباني (es)
 │       │       └── values-fa/strings.xml  # المرجع الفارسي (fa)
-│       ├── test/java/com/xfiles/pro/      # اختبارات الوحدة وRobolectric (86 اختباراً ناجحاً 100%)
+│       ├── test/java/com/xfiles/pro/      # اختبارات الوحدة وRobolectric (163 اختباراً ناجحاً 100%)
 │       └── androidTest/java/com/xfiles/pro/
 ├── gradle/
 │   └── libs.versions.toml     # كتالوج إصدارات المكتبات الموحد
@@ -68,12 +68,27 @@ com.xfiles.pro
 │   │   ├── FileConflictResolution.kt    # خيارات تعارض الأسماء (OVERWRITE, SKIP, AUTO_RENAME)
 │   │   ├── SafPermission.kt             # نموذج أذونات SAF المحفوظة
 │   │   ├── StorageEvent.kt              # أحداث التخزين اللحظية (Created, Updated, Deleted, Moved)
-│   │   └── IndexingState.kt             # نموذج حالة الفهرسة الدائمة والتقدم
+│   │   ├── IndexingState.kt             # نموذج حالة الفهرسة الدائمة والتقدم
+│   │   ├── FileTab.kt                   # نموذج التبويب المستقل للتصفح المتعدد
+│   │   ├── PaneId.kt                    # معرّف الألواح للـ Dual Pane (PRIMARY, SECONDARY)
+│   │   ├── SearchFilterCriteria.kt      # معايير البحث المتقدم المركبة
+│   │   ├── SizeFilterRange.kt           # نطاقات تصفية الأحجام
+│   │   ├── DateFilterRange.kt           # نطاقات تصفية التواريخ
+│   │   ├── SearchTarget.kt              # تحديد أهداف البحث (ملفات/مجلدات/الكل)
+│   │   ├── ArchiveFormat.kt             # صيغ الأرشيفات المدعومة (ZIP, TAR, TAR.GZ, TGZ, GZIP, BZIP2, XZ, 7Z, RAR)
+│   │   ├── CompressionLevel.kt          # مستويات الضغط (STORE, FAST, NORMAL, MAXIMUM, ULTRA)
+│   │   ├── ArchiveEntryItem.kt          # تمثيل عناصر الأرشيف الافتراضية والمسارات والأحجام
+│   │   ├── ArchiveProgress.kt           # تقدم عمليات الأرشيف اللحظية
+│   │   ├── ArchiveSecurityPolicy.kt     # فحص سياسات الأمان (Zip Slip & Archive Bombs)
+│   │   └── ArchiveSecurityException.kt  # استثناءات الأمان للأرشيفات
 │   └── repository/
 │       ├── LanguageRepository.kt        # عقد مستودع إدارة اللغات
 │       ├── ThemeRepository.kt           # عقد مستودع إدارة السمات
 │       ├── StorageRepository.kt         # عقد مستودع التخزين والـ SAF ودفق الأحداث
-│       └── FileIndexingRepository.kt    # عقد مستودع الفهرسة الدائمة والبحث النصي FTS
+│       ├── FileIndexingRepository.kt    # عقد مستودع الفهرسة الدائمة والبحث النصي FTS
+│       ├── TabRepository.kt             # عقد مستودع التبويبات المتعددة الدائمة
+│       ├── SearchHistoryRepository.kt   # عقد مستودع سجل البحث
+│       └── ArchiveRepository.kt         # عقد مستودع إدارة وضغط وفك واستعراض الأرشيفات
 │
 ├── data/                                # طبقة البيانات
 │   ├── local/
@@ -84,7 +99,16 @@ com.xfiles.pro
 │   │   │   └── dao/IndexedFileDao.kt           # استعلامات FTS والبحث والتصفية الدفعية
 │   │   ├── datastore/
 │   │   │   ├── LanguagePreferences.kt   # حفظ تفضيلات اللغة وحالة أول تشغيل عبر DataStore
-│   │   │   └── ThemePreferences.kt      # حفظ تفضيلات السمة ومزامنتها عبر نفس الـ DataStore
+│   │   │   ├── ThemePreferences.kt      # حفظ تفضيلات السمة ومزامنتها عبر نفس الـ DataStore
+│   │   │   ├── TabPreferences.kt        # حفظ التبويبات المتعددة النشطة والدائمة
+│   │   │   └── SearchPreferences.kt     # استمرارية سجل آخر 15 استعلام بحث
+│   │   ├── archive/                     # محركات الأرشيفات المتخصصة
+│   │   │   ├── ArchiveBufferConstants.kt # ثوابت تدفق الذاكرة ومصفوفات الضغط
+│   │   │   ├── ZipArchiveHandler.kt     # معالجة ZIP وتشفير AES-256 والتعديل الموضعي (Zip4j)
+│   │   │   ├── TarArchiveHandler.kt     # معالجة TAR و TAR.GZ و TGZ (Commons Compress)
+│   │   │   ├── SingleCompressorHandler.kt # معالجة تدفقات GZIP و BZIP2 و XZ
+│   │   │   ├── SevenZArchiveHandler.kt  # إنشاء واستخراج واستعراض أرشيفات 7Z (Commons Compress)
+│   │   │   └── RarArchiveHandler.kt     # استعراض واستخراج أرشيفات RAR (Junrar)
 │   │   └── storage/
 │   │       ├── SafManager.kt            # إدارة أذونات ومستندات Storage Access Framework
 │   │       └── MediaStoreManager.kt     # إدارة استعلامات Android MediaStore
@@ -94,10 +118,13 @@ com.xfiles.pro
 │       ├── LanguageRepositoryImpl.kt    # تطبيق مستودع اللغة المدعوم بـ DataStore
 │       ├── ThemeRepositoryImpl.kt       # تطبيق مستودع السمة المدعوم بـ DataStore
 │       ├── StorageRepositoryImpl.kt     # تطبيق مستودع التخزين المعتمد على SAF و MediaStore والنسخ الآمن
-│       └── FileIndexingRepositoryImpl.kt # تطبيق مستودع الفهرسة التزايدي والبحث الفوري FTS
+│       ├── FileIndexingRepositoryImpl.kt # تطبيق مستودع الفهرسة التزايدي والبحث الفوري FTS
+│       ├── TabRepositoryImpl.kt         # تطبيق مستودع التبويبات المتعددة
+│       ├── SearchHistoryRepositoryImpl.kt # تطبيق مستودع سجل البحث
+│       └── ArchiveRepositoryImpl.kt     # تطبيق مستودع الأرشيفات المركزي وسياسات الأمان
 │
 ├── di/                                  # حاوية حقن التبعيات
-│   └── AppContainer.kt                  # توفير Singletons للمستودعات وقاعدة البيانات والـ SAF
+│   └── AppContainer.kt                  # توفير Singletons للمستودعات وقاعدة البيانات والـ SAF والأرشيفات
 │
 └── ui/                                  # طبقة واجهة المستخدم
     ├── navigation/
@@ -110,7 +137,21 @@ com.xfiles.pro
     ├── files/
     │   ├── FilesUiState.kt              # حالة واجهة استعراض الملفات والعمليات
     │   ├── FilesViewModel.kt            # إدارة منطق التصفح، شريط المسار، وعمليات الملفات
-    │   └── FilesScreen.kt               # شاشة استعراض الملفات، شريط المسار التفاعلي، زر FAB، ونوافذ العمليات
+    │   ├── FilesScreen.kt               # شاشة استعراض الملفات، شريط المسار التفاعلي، زر FAB، ونوافذ العمليات
+    │   └── components/                  # مكونات التصفح المتقدم
+    │       ├── DualPaneFilesView.kt     # واجهة اللوح المزدوج للشاشات اللوحية والعمليات البينية
+    │       ├── FileTabBar.kt            # شريط التبويبات المتعددة المتجاوب
+    │       ├── AdvancedSearchSheet.kt   # ورقة الفلاتر المتقدمة المركبة
+    │       └── SearchHistoryView.kt     # استعراض وحذف سجل البحث
+    ├── archive/                         # واجهات إدارة واستعراض الأرشيفات
+    │   ├── ArchiveUiState.kt            # حالة شاشة استعراض وفك الأرشيف
+    │   ├── ArchiveViewModel.kt          # إدارة تصفح الأرشيف الشجري والفك والحذف والبحث الداخلي
+    │   ├── ArchiveViewerScreen.kt       # شاشة استعراض الأرشيف والشجرة الافتراضية
+    │   └── components/
+    │       ├── CreateArchiveDialog.kt   # نافذة إنشاء الأرشيف واختيار الصيغة والضغط وكلمة المرور
+    │       ├── ExtractArchiveDialog.kt  # نافذة فك الضغط ومجلد الوجهة والتعارض
+    │       ├── PasswordPromptDialog.kt  # نافذة طلب كلمة المرور للأرشيفات المشفرة
+    │       └── ArchiveProgressDialog.kt # نافذة نسبة التقدم والإلغاء الفوري
     ├── media/
     │   └── MediaScreen.kt               # شاشة الوسائط مع تبويبات الصور والفيديوهات والصوتيات
     ├── tools/

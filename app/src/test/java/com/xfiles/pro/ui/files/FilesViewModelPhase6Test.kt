@@ -21,6 +21,9 @@ import com.xfiles.pro.domain.model.FileType
 import com.xfiles.pro.domain.model.PaneId
 import com.xfiles.pro.domain.model.SearchTarget
 import com.xfiles.pro.domain.model.SizeFilterRange
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +54,7 @@ class FilesViewModelPhase6Test {
     val tempFolder = TemporaryFolder()
 
     private val testDispatcher = UnconfinedTestDispatcher()
+    private lateinit var testScope: CoroutineScope
 
     private lateinit var context: Context
     private lateinit var database: XFilesDatabase
@@ -65,6 +69,7 @@ class FilesViewModelPhase6Test {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        testScope = CoroutineScope(SupervisorJob() + testDispatcher)
         context = ApplicationProvider.getApplicationContext()
         kotlinx.coroutines.runBlocking {
             context.dataStore.edit { it.clear() }
@@ -92,7 +97,8 @@ class FilesViewModelPhase6Test {
             indexedFileDao = database.indexedFileDao(),
             storageRepository = storageRepository,
             mediaStoreManager = mediaStoreManager,
-            safManager = safManager
+            safManager = safManager,
+            externalScope = testScope
         )
         val tabPreferences = TabPreferences(context)
         tabRepository = TabRepositoryImpl(tabPreferences, dispatchers)
@@ -110,6 +116,9 @@ class FilesViewModelPhase6Test {
 
     @After
     fun tearDown() {
+        if (::testScope.isInitialized) {
+            testScope.cancel()
+        }
         if (::database.isInitialized) {
             database.close()
         }
@@ -117,7 +126,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `initial state starts with at least one tab`() {
+    fun `initial state starts with at least one tab`() = runTest {
         val state = viewModel.uiState.value
         assertTrue("Tabs must not be empty", state.tabs.isNotEmpty())
         assertEquals(0, state.activeTabIndex)
@@ -125,7 +134,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `opening new tab adds to list and switches active tab`() {
+    fun `opening new tab adds to list and switches active tab`() = runTest {
         val folder = File(rootDir, "Music").apply { mkdirs() }
         viewModel.openNewTab(folder.absolutePath, "Music")
 
@@ -137,7 +146,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `closing a tab does not allow closing the last tab`() {
+    fun `closing a tab does not allow closing the last tab`() = runTest {
         // Initial tabs count: 1
         assertEquals(1, viewModel.uiState.value.tabs.size)
 
@@ -155,7 +164,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `close other tabs leaves only active tab`() {
+    fun `close other tabs leaves only active tab`() = runTest {
         val f1 = File(rootDir, "F1").apply { mkdirs() }
         val f2 = File(rootDir, "F2").apply { mkdirs() }
 
@@ -169,7 +178,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `dual pane toggle changes dual pane mode and active pane`() {
+    fun `dual pane toggle changes dual pane mode and active pane`() = runTest {
         assertFalse(viewModel.uiState.value.isDualPaneMode)
         viewModel.toggleDualPaneMode()
         assertTrue(viewModel.uiState.value.isDualPaneMode)
@@ -209,7 +218,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `advanced search criteria updates and clear filters works`() {
+    fun `advanced search criteria updates and clear filters works`() = runTest {
         viewModel.onSearchQueryChange("report")
         viewModel.setFileTypeFilter(FileType.DOCUMENT)
         viewModel.setSizeFilter(SizeFilterRange.MEDIUM_1_50MB)
@@ -231,7 +240,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `open search result in new tab adds tab and closes search`() {
+    fun `open search result in new tab adds tab and closes search`() = runTest {
         val targetFolder = File(rootDir, "TargetFolder").apply { mkdirs() }
         val searchItem = FileItem(
             name = "TargetFolder",
@@ -251,7 +260,7 @@ class FilesViewModelPhase6Test {
     }
 
     @Test
-    fun `navigate to parent folder from search result updates active pane`() {
+    fun `navigate to parent folder from search result updates active pane`() = runTest {
         val parentDir = File(rootDir, "ParentFolder").apply { mkdirs() }
         val childFile = File(parentDir, "item.txt").apply { writeText("abc") }
 

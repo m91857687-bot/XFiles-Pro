@@ -25,7 +25,7 @@ class SevenZArchiveHandler {
     suspend fun listEntries(archiveFile: File): ResultWrapper<List<ArchiveEntryItem>> {
         return try {
             val items = mutableListOf<ArchiveEntryItem>()
-            SevenZFile(archiveFile).use { sevenZ ->
+            SevenZFile.builder().setFile(archiveFile).get().use { sevenZ ->
                 for (entry in sevenZ.entries) {
                     val cleanPath = entry.name.replace('\\', '/')
                     val name = cleanPath.trimEnd('/').substringAfterLast('/')
@@ -151,7 +151,7 @@ class SevenZArchiveHandler {
             val buffer = ByteArray(ArchiveBufferConstants.BUFFER_SIZE)
             var totalUncompressedWritten = 0L
 
-            SevenZFile(archiveFile).use { sevenZ ->
+            SevenZFile.builder().setFile(archiveFile).get().use { sevenZ ->
                 var entry: SevenZArchiveEntry? = sevenZ.nextEntry
                 while (entry != null) {
                     currentCoroutineContext().ensureActive()

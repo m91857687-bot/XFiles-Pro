@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
@@ -390,7 +391,7 @@ fun ArchiveEntryRow(
             imageVector = when {
                 entry.isDirectory -> Icons.Default.Folder
                 entry.isEncrypted -> Icons.Default.Lock
-                else -> Icons.Default.InsertDriveFile
+                else -> Icons.AutoMirrored.Filled.InsertDriveFile
             },
             contentDescription = null,
             tint = if (entry.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,

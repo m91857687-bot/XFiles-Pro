@@ -25,6 +25,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.NoteAdd
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.ViewSidebar
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
@@ -34,11 +37,8 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.NoteAdd
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ViewSidebar
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -221,7 +221,7 @@ fun FilesScreen(
                     modifier = Modifier.testTag("files_dual_pane_toggle")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ViewSidebar,
+                        imageVector = Icons.AutoMirrored.Filled.ViewSidebar,
                         contentDescription = stringResource(R.string.dual_pane_toggle),
                         tint = if (showDualPane) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -368,7 +368,7 @@ fun FilesScreen(
                         showFabMenu = false
                         viewModel.openCreateFileDialog()
                     },
-                    leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = null) }
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.archive_create_title)) },
@@ -705,7 +705,7 @@ private fun SearchResultRow(
                             showMenu = false
                             onOpenInNewTab()
                         },
-                        leadingIcon = { Icon(Icons.Default.OpenInNew, contentDescription = null) }
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null) }
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.dual_pane_copy_to_other)) },

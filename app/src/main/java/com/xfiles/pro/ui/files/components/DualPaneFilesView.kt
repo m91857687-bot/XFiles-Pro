@@ -22,10 +22,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -322,7 +322,7 @@ private fun PaneFileRow(
                     modifier = Modifier.size(28.dp).testTag("dual_pane_move_button")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.DriveFileMove,
+                        imageVector = Icons.AutoMirrored.Filled.DriveFileMove,
                         contentDescription = stringResource(R.string.dual_pane_move_to_other),
                         tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(16.dp)

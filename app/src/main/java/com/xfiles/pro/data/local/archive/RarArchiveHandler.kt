@@ -41,7 +41,7 @@ class RarArchiveHandler {
                 }
 
                 for (header in rar.fileHeaders) {
-                    val rawName = header.fileName ?: (header.fileNameW ?: "")
+                    val rawName = header.fileName ?: ""
                     val cleanPath = rawName.replace('\\', '/')
                     val name = cleanPath.trimEnd('/').substringAfterLast('/')
                     items.add(
@@ -85,7 +85,7 @@ class RarArchiveHandler {
 
                 val targetHeaders = if (selectedSet != null) {
                     rar.fileHeaders.filter { header ->
-                        val cleanPath = (header.fileName ?: header.fileNameW ?: "").replace('\\', '/')
+                        val cleanPath = (header.fileName ?: "").replace('\\', '/')
                         selectedSet.contains(cleanPath) || selectedSet.any { cleanPath.startsWith("$it/") }
                     }
                 } else {
@@ -97,7 +97,7 @@ class RarArchiveHandler {
                 for (header in targetHeaders) {
                     currentCoroutineContext().ensureActive()
 
-                    val rawName = header.fileName ?: (header.fileNameW ?: "")
+                    val rawName = header.fileName ?: ""
                     val cleanPath = rawName.replace('\\', '/')
                     val targetFile = ArchiveSecurityPolicy.resolveAndValidateDestination(destinationDir, cleanPath)
 
