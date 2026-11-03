@@ -65,6 +65,7 @@ data class QuickAccessItem(
 @Composable
 fun HomeScreen(
     onNavigate: (NavDestination) -> Unit,
+    onOpenDownloads: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -128,7 +129,13 @@ fun HomeScreen(
                     for (item in rowChunk) {
                         QuickAccessCard(
                             item = item,
-                            onClick = { onNavigate(item.destination) },
+                            onClick = {
+                                if (item.id == "downloads" && onOpenDownloads != null) {
+                                    onOpenDownloads()
+                                } else {
+                                    onNavigate(item.destination)
+                                }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }

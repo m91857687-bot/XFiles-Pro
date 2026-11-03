@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.xfiles.pro.R
 
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Download
+
 data class ToolItemData(
     val id: String,
     val titleRes: Int,
@@ -50,11 +53,13 @@ data class ToolItemData(
 
 @Composable
 fun ToolsScreen(
+    onOpenDownloads: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
     val toolItems = listOf(
+        ToolItemData("downloads", R.string.download_manager_title, R.string.download_manager_desc, Icons.Default.Download, "Phase 8"),
         ToolItemData("storage_analyzer", R.string.tool_storage_analyzer, R.string.tool_storage_analyzer_desc, Icons.Default.PieChart, "Phase 11"),
         ToolItemData("duplicate_cleaner", R.string.tool_duplicate_cleaner, R.string.tool_duplicate_cleaner_desc, Icons.Default.FileCopy, "Phase 11"),
         ToolItemData("recycle_bin", R.string.tool_recycle_bin, R.string.tool_recycle_bin_desc, Icons.Default.DeleteSweep, "Phase 14"),
@@ -87,17 +92,28 @@ fun ToolsScreen(
         Spacer(modifier = Modifier.height(4.dp))
 
         toolItems.forEach { tool ->
-            ToolItemCard(tool = tool)
+            ToolItemCard(
+                tool = tool,
+                onClick = {
+                    if (tool.id == "downloads") {
+                        onOpenDownloads?.invoke()
+                    }
+                }
+            )
         }
     }
 }
 
 @Composable
-private fun ToolItemCard(tool: ToolItemData) {
+private fun ToolItemCard(
+    tool: ToolItemData,
+    onClick: (() -> Unit)? = null
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
             .testTag("tool_card_${tool.id}"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

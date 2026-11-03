@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.xfiles.pro.domain.model.AppLanguage
 import com.xfiles.pro.domain.model.ThemeMode
 import com.xfiles.pro.ui.components.XFilesTopAppBar
+import com.xfiles.pro.ui.download.DownloadManagerScreen
 import com.xfiles.pro.ui.files.FilesScreen
 import com.xfiles.pro.ui.home.HomeScreen
 import com.xfiles.pro.ui.media.MediaScreen
@@ -57,54 +58,102 @@ fun XFilesAppShell(
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(initialDestination) }
     var isGridView by rememberSaveable { mutableStateOf(false) }
+    var showDownloadManager by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Android Back key handling: Return to Home if on sub-screen
-    BackHandler(enabled = currentDestination != NavDestination.HOME) {
-        currentDestination = NavDestination.HOME
+    // Android Back key handling: Return to Home if on sub-screen or close Download Manager
+    BackHandler(enabled = showDownloadManager || currentDestination != NavDestination.HOME) {
+        if (showDownloadManager) {
+            showDownloadManager = false
+        } else {
+            currentDestination = NavDestination.HOME
+        }
     }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize().testTag("app_shell_root")) {
-        val isWideScreen = maxWidth >= 600.dp
+        if (showDownloadManager) {
+            DownloadManagerScreen(
+                onBackClick = { showDownloadManager = false },
+                onNavigateToFolder = {
+                    showDownloadManager = false
+                    currentDestination = NavDestination.FILES
+                }
+            )
+        } else {
+            val isWideScreen = maxWidth >= 600.dp
 
-        if (isWideScreen) {
-            // Adaptive Tablet / Desktop Layout: Navigation Rail on the side
-            Row(modifier = Modifier.fillMaxSize()) {
-                NavigationRail(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .testTag("app_navigation_rail"),
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    NavDestination.entries.forEach { destination ->
-                        val isSelected = destination == currentDestination
-                        NavigationRailItem(
-                            selected = isSelected,
-                            onClick = { currentDestination = destination },
-                            icon = {
-                                Icon(
-                                    imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
-                                    contentDescription = stringResource(id = destination.labelRes)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = destination.labelRes),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            modifier = Modifier.testTag("nav_rail_item_${destination.route}")
-                        )
+            if (isWideScreen) {
+                // Adaptive Tablet / Desktop Layout: Navigation Rail on the side
+                Row(modifier = Modifier.fillMaxSize()) {
+                    NavigationRail(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .testTag("app_navigation_rail"),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ) {
+                        NavDestination.entries.forEach { destination ->
+                            val isSelected = destination == currentDestination
+                            NavigationRailItem(
+                                selected = isSelected,
+                                onClick = { currentDestination = destination },
+                                icon = {
+                                    Icon(
+                                        imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
+                                        contentDescription = stringResource(id = destination.labelRes)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(id = destination.labelRes),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                ),
+                                modifier = Modifier.testTag("nav_rail_item_${destination.route}")
+                            )
+                        }
+                    }
+
+                    Scaffold(
+                        topBar = {
+                            XFilesTopAppBar(
+                                currentDestination = currentDestination,
+                                isGridView = isGridView,
+                                showViewToggle = currentDestination == NavDestination.FILES,
+                                onViewToggleClick = { isGridView = !isGridView },
+                                onSearchClick = {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Search engine scheduled in Phase 6")
+                                    }
+                                }
+                            )
+                        },
+                        snackbarHost = { SnackbarHost(snackbarHostState) },
+                        containerColor = MaterialTheme.colorScheme.background,
+                        modifier = Modifier.weight(1f)
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                            ActiveScreenContent(
+                                destination = currentDestination,
+                                isGridView = isGridView,
+                                currentLanguage = currentLanguage,
+                                currentTheme = currentTheme,
+                                onChangeLanguageClick = onChangeLanguageClick,
+                                onChangeThemeClick = onChangeThemeClick,
+                                onNavigate = { currentDestination = it },
+                                onOpenDownloads = { showDownloadManager = true }
+                            )
+                        }
                     }
                 }
-
+            } else {
+                // Mobile Portrait Layout: Bottom Navigation Bar
                 Scaffold(
                     topBar = {
                         XFilesTopAppBar(
@@ -119,9 +168,45 @@ fun XFilesAppShell(
                             }
                         )
                     },
+                    bottomBar = {
+                        NavigationBar(
+                            modifier = Modifier.testTag("app_navigation_bar"),
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            tonalElevation = 3.dp
+                        ) {
+                            NavDestination.entries.forEach { destination ->
+                                val isSelected = destination == currentDestination
+                                NavigationBarItem(
+                                    selected = isSelected,
+                                    onClick = { currentDestination = destination },
+                                    icon = {
+                                        Icon(
+                                            imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
+                                            contentDescription = stringResource(id = destination.labelRes)
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = destination.labelRes),
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                            )
+                                        )
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                    ),
+                                    modifier = Modifier.testTag("nav_item_${destination.route}")
+                                )
+                            }
+                        }
+                    },
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     containerColor = MaterialTheme.colorScheme.background,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         ActiveScreenContent(
@@ -131,77 +216,10 @@ fun XFilesAppShell(
                             currentTheme = currentTheme,
                             onChangeLanguageClick = onChangeLanguageClick,
                             onChangeThemeClick = onChangeThemeClick,
-                            onNavigate = { currentDestination = it }
+                            onNavigate = { currentDestination = it },
+                            onOpenDownloads = { showDownloadManager = true }
                         )
                     }
-                }
-            }
-        } else {
-            // Mobile Portrait Layout: Bottom Navigation Bar
-            Scaffold(
-                topBar = {
-                    XFilesTopAppBar(
-                        currentDestination = currentDestination,
-                        isGridView = isGridView,
-                        showViewToggle = currentDestination == NavDestination.FILES,
-                        onViewToggleClick = { isGridView = !isGridView },
-                        onSearchClick = {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Search engine scheduled in Phase 6")
-                            }
-                        }
-                    )
-                },
-                bottomBar = {
-                    NavigationBar(
-                        modifier = Modifier.testTag("app_navigation_bar"),
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                        tonalElevation = 3.dp
-                    ) {
-                        NavDestination.entries.forEach { destination ->
-                            val isSelected = destination == currentDestination
-                            NavigationBarItem(
-                                selected = isSelected,
-                                onClick = { currentDestination = destination },
-                                icon = {
-                                    Icon(
-                                        imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
-                                        contentDescription = stringResource(id = destination.labelRes)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(id = destination.labelRes),
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                        )
-                                    )
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                ),
-                                modifier = Modifier.testTag("nav_item_${destination.route}")
-                            )
-                        }
-                    }
-                },
-                snackbarHost = { SnackbarHost(snackbarHostState) },
-                containerColor = MaterialTheme.colorScheme.background,
-                modifier = Modifier.fillMaxSize()
-            ) { innerPadding ->
-                Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                    ActiveScreenContent(
-                        destination = currentDestination,
-                        isGridView = isGridView,
-                        currentLanguage = currentLanguage,
-                        currentTheme = currentTheme,
-                        onChangeLanguageClick = onChangeLanguageClick,
-                        onChangeThemeClick = onChangeThemeClick,
-                        onNavigate = { currentDestination = it }
-                    )
                 }
             }
         }
@@ -216,13 +234,14 @@ private fun ActiveScreenContent(
     currentTheme: ThemeMode,
     onChangeLanguageClick: () -> Unit,
     onChangeThemeClick: () -> Unit,
-    onNavigate: (NavDestination) -> Unit
+    onNavigate: (NavDestination) -> Unit,
+    onOpenDownloads: () -> Unit
 ) {
     when (destination) {
-        NavDestination.HOME -> HomeScreen(onNavigate = onNavigate)
+        NavDestination.HOME -> HomeScreen(onNavigate = onNavigate, onOpenDownloads = onOpenDownloads)
         NavDestination.FILES -> FilesScreen(isGridView = isGridView)
         NavDestination.MEDIA -> MediaScreen()
-        NavDestination.TOOLS -> ToolsScreen()
+        NavDestination.TOOLS -> ToolsScreen(onOpenDownloads = onOpenDownloads)
         NavDestination.SETTINGS -> SettingsScreen(
             currentLanguage = currentLanguage,
             currentTheme = currentTheme,
